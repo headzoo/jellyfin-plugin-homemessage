@@ -1,3 +1,5 @@
+using Jellyfin.Plugin.HomeMessage.Store;
+
 namespace Jellyfin.Plugin.HomeMessage.Models;
 
 /// <summary>
@@ -16,4 +18,4 @@ public record Message(
     string BgColor,
     // The text color of the message.
     string TextColor
-);
+) : IHasId;
