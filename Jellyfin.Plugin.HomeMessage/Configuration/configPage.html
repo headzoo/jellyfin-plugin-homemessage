@@ -1,0 +1,165 @@
+<!doctype html>
+<html>
+    <head>
+        <meta charset="utf-8" />
+        <title>Home Message</title>
+    </head>
+
+    <body>
+        <div
+            data-role="page"
+            class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
+            data-require="emby-input,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-radio"
+        >
+            <div data-role="content">
+                <div class="content-primary">
+                    <h2>Home Message</h2>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-message"
+                            >Message</label
+                        >
+                        <input is="emby-input" id="input-message" type="text" />
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-bg-color"
+                            >Background color</label
+                        >
+                        <input is="emby-input" id="input-bg-color" type="text" />
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-text-color"
+                            >Text color</label
+                        >
+                        <input is="emby-input" id="input-text-color" type="text" />
+                    </div>
+
+                    <div class="selectContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-position">
+                            Position
+                        </label>
+                        <select
+                            is="emby-select"
+                            id="input-position"
+                            class="emby-select-withcolor emby-select"
+                        >
+                            <option value="top">Top</option>
+                            <option value="bottom">Bottom</option>
+                        </select>
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="inputLabel inputLabelUnfocused" for="input-dismissible">
+                            <input is="emby-checkbox" id="input-dismissible" type="checkbox" />
+                            <span>Dismissible</span>
+                        </label>
+                    </div>
+
+                    <div>
+                        <button
+                            is="emby-button"
+                            type="button"
+                            class="raised button-submit block emby-button"
+                            id="btn-save"
+                        >
+                            <span>Save</span>
+                        </button>
+                    </div>
+
+                    <script>
+                        const HomeMessagePage = {
+                            guid: '69d36d38-5615-4128-b2e0-30caf4c5ba86',
+                            elements: {
+                                Message: null,
+                                BgColor: null,
+                                TextColor: null,
+                                Position: null,
+                                Dismissible: null,
+                                Submit: null,
+                            },
+
+                            /**
+                             * Initialize the page.
+                             */
+                            init: () => {
+                                HomeMessagePage.elements.Message =
+                                    document.getElementById('input-message');
+                                HomeMessagePage.elements.BgColor =
+                                    document.getElementById('input-bg-color');
+                                HomeMessagePage.elements.TextColor =
+                                    document.getElementById('input-text-color');
+                                HomeMessagePage.elements.Position =
+                                    document.getElementById('input-position');
+                                HomeMessagePage.elements.Dismissible =
+                                    document.getElementById('input-dismissible');
+                                HomeMessagePage.elements.Submit =
+                                    document.getElementById('btn-save');
+
+                                HomeMessagePage.loadConfig();
+                                HomeMessagePage.elements.Submit.addEventListener(
+                                    'click',
+                                    HomeMessagePage.saveConfig,
+                                );
+                            },
+
+                            /**
+                             * Load the configuration.
+                             */
+                            loadConfig: () => {
+                                Dashboard.showLoadingMsg();
+                                ApiClient.getPluginConfiguration(HomeMessagePage.guid)
+                                    .then((cfg) => {
+                                        HomeMessagePage.elements.Message.value = cfg.Message || '';
+                                        HomeMessagePage.elements.BgColor.value =
+                                            cfg.BgColor || '#111827';
+                                        HomeMessagePage.elements.TextColor.value =
+                                            cfg.TextColor || '#ffffff';
+                                        HomeMessagePage.elements.Position.value =
+                                            cfg.Position || 'top';
+                                        HomeMessagePage.elements.Dismissible.checked =
+                                            !!cfg.Dismissible;
+                                        console.log(cfg);
+                                    })
+                                    .catch((error) => {
+                                        console.error(error);
+                                    })
+                                    .finally(() => {
+                                        Dashboard.hideLoadingMsg();
+                                    });
+                            },
+
+                            /**
+                             * Save the configuration.
+                             */
+                            saveConfig: () => {
+                                Dashboard.showLoadingMsg();
+
+                                let config = {
+                                    Message: HomeMessagePage.elements.Message.value,
+                                    BgColor: HomeMessagePage.elements.BgColor.value,
+                                    TextColor: HomeMessagePage.elements.TextColor.value,
+                                    Position: HomeMessagePage.elements.Position.value,
+                                    Dismissible: HomeMessagePage.elements.Dismissible.checked,
+                                };
+                                console.log(config);
+
+                                ApiClient.updatePluginConfiguration(HomeMessagePage.guid, config)
+                                    .then(Dashboard.processPluginConfigurationUpdateResult)
+                                    .catch((error) => {
+                                        console.error(error);
+                                    })
+                                    .finally(() => {
+                                        Dashboard.hideLoadingMsg();
+                                    });
+                            },
+                        };
+
+                        HomeMessagePage.init();
+                    </script>
+                </div>
+            </div>
+        </div>
+    </body>
+</html>

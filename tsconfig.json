@@ -1,0 +1,32 @@
+{
+  "compilerOptions": {
+    "module": "es6",
+    "target": "es6",
+    "lib": ["dom", "dom.iterable", "es6"],
+    "allowJs": true,
+    "skipLibCheck": true,
+    "strict": false,
+    "strictNullChecks": true,
+    "incremental": true,
+    "forceConsistentCasingInFileNames": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "isolatedModules": true,
+    "noImplicitReturns": true,
+    "noUnusedLocals": false,
+    "sourceMap": true,
+    "noEmit": false,
+    "jsxImportSource": "@emotion/react",
+    "jsx": "preserve",
+    "typeRoots": ["node_modules/@types", "./Jellyfin.Plugin.HomeMessage/Web/js/@types"],
+    "outDir": "Jellyfin.Plugin.HomeMessage/Web/js/build",
+    "baseUrl": "."
+  },
+  "include": [
+    "./Jellyfin.Plugin.HomeMessage/Web/js/home.ts",
+    "./Jellyfin.Plugin.HomeMessage/Web/js/boot.ts",
+    "./Jellyfin.Plugin.HomeMessage/Web/js/@types/**/*.d.ts"
+  ],
+  "exclude": ["node_modules"]
+}
