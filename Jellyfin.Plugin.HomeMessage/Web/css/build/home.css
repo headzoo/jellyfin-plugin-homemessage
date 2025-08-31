@@ -1,8 +1,30 @@
 .home-message-message {
-  width: 80%;
   border-radius: 10px;
   padding: 10px;
   margin: 10px auto;
+}
+.home-message-title {
+  font-weight: bold;
+  font-size: 1.2em;
+  margin-bottom: 0.25em;
+  margin-top: 0;
+  text-align: left;
+}
+.home-message-text {
+  text-align: left;
+  margin: 0 0 0.5em 0;
+  padding: 0;
+}
+.home-message-text:last-child {
+  margin-bottom: 0;
+}
+.home-message-dismiss {
+  font-size: 1.5em;
+  background: none;
+  border: none;
+  color: inherit;
+  cursor: pointer;
+  float: right;
 }
 
 /*# sourceMappingURL=home.css.map */

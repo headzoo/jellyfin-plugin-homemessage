@@ -1,5 +1,10 @@
 export interface Message {
   /**
+   * The ID of the message.
+   */
+  Id: string;
+
+  /**
    * The title of the message.
    */
   Title: string;

@@ -72,11 +72,23 @@ public class HomeMessageController : ControllerBase
     {
         Message[] messages =
         [
-            new Message("Hi", "Hi there!", false, "#333", "#fff"),
-            new Message("Hello", "Hello there!", true, "#333", "#fff"),
+            new Message("1", "Hi", "Hi there!", false, "#333", "#fff"),
+            new Message("2", "Hello", "Hello there!", true, "#333", "#fff"),
         ];
 
         return Ok(messages);
+    }
+
+    /// <summary>
+    /// Deletes a message.
+    /// </summary>
+    /// <param name="id">The ID of the message.</param>
+    /// <returns>The response.</returns>
+    [HttpDelete("messages/{id}")]
+    public IActionResult DeleteMessage(string id)
+    {
+        Plugin.Instance!.Logger.LogInformation("Deleted message {Id}", id);
+        return NoContent();
     }
 
     /// <summary>

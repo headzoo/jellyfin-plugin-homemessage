@@ -6,13 +6,20 @@
   "scripts": {
     "format": "prettier \"**/*.{js,jsx,ts,tsx,json,css,scss,md,html}\" --write",
     "format:check": "prettier \"**/*.{js,jsx,ts,tsx,json,css,scss,md,html}\" --check",
-    "sass:watch": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
-    "ts:watch": "tsc --watch"
+    "sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
+    "watch:sass": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
+    "build": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap",
+    "build:prod": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --minify --sourcemap",
+    "watch:typecheck": "tsc -w --noEmit",
+    "watch:esbuild": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap --watch",
+    "dev": "concurrently -k \"npm:watch:*\""
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
+    "concurrently": "^9.2.1",
+    "esbuild": "^0.25.9",
     "prettier": "^3.6.2",
     "sass": "^1.91.0",
     "typescript": "^5.9.2"

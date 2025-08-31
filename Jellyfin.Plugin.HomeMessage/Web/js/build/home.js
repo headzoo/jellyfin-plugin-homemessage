@@ -1,82 +1,79 @@
-var __awaiter =
-  (this && this.__awaiter) ||
-  function (thisArg, _arguments, P, generator) {
-    function adopt(value) {
-      return value instanceof P
-        ? value
-        : new P(function (resolve) {
-            resolve(value);
-          });
+(() => {
+  // Jellyfin.Plugin.HomeMessage/Web/js/utils.ts
+  var createElement = (tagName, attributes = {}) => {
+    const el = document.createElement(tagName);
+    const attr = Object.assign({}, attributes);
+    if (attr.html) {
+      el.innerHTML = attr.html;
+      delete attr.html;
     }
-    return new (P || (P = Promise))(function (resolve, reject) {
-      function fulfilled(value) {
-        try {
-          step(generator.next(value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function rejected(value) {
-        try {
-          step(generator['throw'](value));
-        } catch (e) {
-          reject(e);
-        }
-      }
-      function step(result) {
-        result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected);
-      }
-      step((generator = generator.apply(thisArg, _arguments || [])).next());
-    });
+    const keys = Object.keys(attr);
+    for (let i = 0; i < keys.length; i++) {
+      const key = keys[i];
+      const value = attr[key];
+      el.setAttribute(key, value);
+    }
+    return el;
   };
-(() =>
-  __awaiter(void 0, void 0, void 0, function* () {
+
+  // Jellyfin.Plugin.HomeMessage/Web/js/home.ts
+  (async () => {
+    const cssClassPrefix = "home-message";
     const { ApiClient } = window;
-    /**
-     * Displays a message on the home page.
-     *
-     * @param {HTMLElement} indexPage The #indexPage element.
-     * @param {Message} message The message to display.
-     */
-    const displayMessage = (indexPage, message) => {
-      const messageElement = document.createElement('div');
-      messageElement.classList.add('home-message-message');
-      messageElement.innerText = message.Title;
-      messageElement.style.backgroundColor = message.BgColor;
-      messageElement.style.color = message.TextColor;
-      indexPage.prepend(messageElement);
+    const displayMessage = (messageElements, message) => {
+      const messageElement = createElement("div", {
+        class: `${cssClassPrefix}-message`,
+        style: `background-color: ${message.BgColor}; color: ${message.TextColor};`
+      });
+      if (message.Dismissible) {
+        const btn = createElement("button", {
+          title: "Close",
+          class: `${cssClassPrefix}-dismiss`,
+          html: "&times;"
+        });
+        btn.addEventListener("click", async () => {
+          messageElements.removeChild(messageElement);
+          const url = ApiClient.getUrl(`HomeMessage/messages/${message.Id}`);
+          await ApiClient.ajax({
+            type: "DELETE",
+            url
+          });
+        });
+        messageElement.appendChild(btn);
+      }
+      const titleElement = createElement("h3", {
+        class: `${cssClassPrefix}-title`,
+        html: message.Title
+      });
+      messageElement.appendChild(titleElement);
+      const textElement = createElement("p", {
+        class: `${cssClassPrefix}-text`,
+        html: message.Text
+      });
+      messageElement.appendChild(textElement);
+      messageElements.appendChild(messageElement);
     };
-    /**
-     * Called when the page is ready.
-     *
-     * @param {HTMLElement} indexPage The #indexPage element.
-     */
-    const ready = (indexPage) =>
-      __awaiter(void 0, void 0, void 0, function* () {
-        const url = ApiClient.getUrl('HomeMessage/messages');
-        const messages = yield ApiClient.getJSON(url);
-        for (let i = 0; i < messages.length; i++) {
-          const message = messages[i];
-          displayMessage(indexPage, message);
-        }
+    const ready = async (indexPage) => {
+      const messageElements = createElement("div", {
+        class: `${cssClassPrefix}-messages emby-scroller`
       });
-    /**
-     * Waits for the #indexPage element to be available, then calls ready().
-     */
-    const boot = () =>
-      __awaiter(void 0, void 0, void 0, function* () {
-        const indexPage = document.getElementById('indexPage');
-        if (!indexPage) {
-          setTimeout(
-            () =>
-              __awaiter(void 0, void 0, void 0, function* () {
-                return yield boot();
-              }),
-            100,
-          );
-          return;
-        }
-        yield ready(indexPage);
-      });
-    yield boot();
-  }))();
+      indexPage.prepend(messageElements);
+      const url = ApiClient.getUrl("HomeMessage/messages");
+      const messages = await ApiClient.getJSON(url);
+      for (let i = 0; i < messages.length; i++) {
+        const message = messages[i];
+        displayMessage(messageElements, message);
+      }
+    };
+    const boot = async () => {
+      const indexPage = document.getElementById("indexPage");
+      if (!indexPage) {
+        setTimeout(async () => await boot(), 100);
+        return;
+      }
+      await ready(indexPage);
+    };
+    await boot();
+  })();
+})();
+//# sourceMappingURL=home.js.map

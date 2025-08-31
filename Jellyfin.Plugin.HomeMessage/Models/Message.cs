@@ -4,6 +4,8 @@ namespace Jellyfin.Plugin.HomeMessage.Models;
 /// Represents a single message to display on the home page.
 /// </summary>
 public record Message(
+    // The ID of the message.
+    string Id,
     // The title of the message.
     string Title,
     // The message.
