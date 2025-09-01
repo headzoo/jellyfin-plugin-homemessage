@@ -47,10 +47,19 @@ public abstract class Store<T>
     protected IReadOnlyList<T> Cache => _cache;
 
     /// <summary>
+    /// Gets all dismissed state from the database.
+    /// </summary>
+    /// <returns>The dismissed state.</returns>
+    public T[] GetAll()
+    {
+        return [.. _cache];
+    }
+
+    /// <summary>
     /// Adds the given object to the cache and writes it to the database.
     /// </summary>
     /// <param name="obj">The object to add.</param>
-    protected void Write(T obj)
+    public void Write(T obj)
     {
         _cache.Add(obj);
         File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
@@ -60,7 +69,7 @@ public abstract class Store<T>
     /// Removes the given object from the cache and writes it to the database.
     /// </summary>
     /// <param name="id">The ID of the object to remove.</param>
-    protected void Remove(string id)
+    public void Remove(string id)
     {
         _cache.RemoveAll(m => m.Id == id);
         File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));

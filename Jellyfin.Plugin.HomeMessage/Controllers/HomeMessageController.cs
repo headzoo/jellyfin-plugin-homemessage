@@ -132,7 +132,7 @@ public class HomeMessageController(
         }
 
         _logger.LogInformation("Deleted message {Id}", id);
-        _dismissedStore.Add(
+        _dismissedStore.Write(
             new Dismissed(Guid.NewGuid().ToString(), id, authInfo.UserId.ToString())
         );
 
