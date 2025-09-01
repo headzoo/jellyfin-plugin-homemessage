@@ -17,5 +17,9 @@ public record Message(
     // The background color of the message.
     string BgColor,
     // The text color of the message.
-    string TextColor
+    string TextColor,
+    // The time when the message should be shown.
+    int? TimeStart,
+    // The time when the message should be hidden.
+    int? TimeEnd
 ) : IHasId;

@@ -28,4 +28,14 @@ export interface Message {
    * The text color of the message.
    */
   TextColor: string;
+
+  /**
+   * The time when the message should be shown.
+   */
+  TimeStart?: number;
+
+  /**
+   * The time when the message should be hidden.
+   */
+  TimeEnd?: number;
 }

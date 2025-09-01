@@ -1,3 +1,4 @@
+using System;
 using System.Linq;
 using Jellyfin.Plugin.HomeMessage.Models;
 using MediaBrowser.Controller;
@@ -27,8 +28,15 @@ public class MessageStore(IServerApplicationPaths paths) : Store<Message>(paths,
     public Message[] GetNotDismissed(Dismissed[] dismissed)
     {
         var ids = dismissed.Select(d => d.MessageId).ToArray();
+        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
 
-        return [.. Cache.Where(m => !ids.Contains(m.Id))];
+        return
+        [
+            .. Cache
+                .Where(m => !ids.Contains(m.Id))
+                .Where(m => m.TimeStart is null || m.TimeStart <= now)
+                .Where(m => m.TimeEnd is null || m.TimeEnd > now),
+        ];
     }
 
     /// <summary>

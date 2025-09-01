@@ -18,12 +18,14 @@ namespace Jellyfin.Plugin.HomeMessage.Controllers;
 /// Initializes a new instance of the <see cref="HomeMessageController"/> class.
 /// </remarks>
 /// <param name="auth">Instance of the <see cref="IAuthorizationContext"/> interface.</param>
+/// <param name="logger">Instance of the <see cref="ILogger{TCategoryName}"/> interface.</param>
 /// <param name="messageStore">Instance of the <see cref="MessageStore"/> class.</param>
 /// <param name="dismissedStore">Instance of the <see cref="DismissedStore"/> class.</param>
 [ApiController]
 [Route("HomeMessage")]
 public class HomeMessageController(
     IAuthorizationContext auth,
+    ILogger<HomeMessageController> logger,
     MessageStore messageStore,
     DismissedStore dismissedStore
 ) : ControllerBase
@@ -32,6 +34,11 @@ public class HomeMessageController(
     /// Gets the authorization context.
     /// </summary>
     private readonly IAuthorizationContext _auth = auth;
+
+    /// <summary>
+    /// Gets the logger.
+    /// </summary>
+    private readonly ILogger<HomeMessageController> _logger = logger;
 
     /// <summary>
     /// Gets the message store.
@@ -85,7 +92,6 @@ public class HomeMessageController(
         cfg.BgColor = req.BgColor ?? cfg.BgColor;
         cfg.TextColor = req.TextColor ?? cfg.TextColor;
         cfg.Position = req.Position ?? cfg.Position;
-
         Plugin.Instance!.UpdateConfiguration(cfg);
 
         return NoContent();
@@ -106,18 +112,9 @@ public class HomeMessageController(
         }
 
         var dismissed = _dismissedStore.GetByUserId(authInfo.UserId.ToString());
-        var messages2 = _messageStore.GetNotDismissed(dismissed);
+        var messages = _messageStore.GetNotDismissed(dismissed);
 
-        // _messageStore.Add(new Message("1", "Hi", "Hi there!", false, "#333", "#fff"));
-        // _messageStore.Add(new Message("2", "Hello", "Hello there!", true, "#333", "#fff"));
-
-        /* Message[] messages =
-        [
-            new Message("1", "Hi", "Hi there!", false, "#333", "#fff"),
-            new Message("2", "Hello", "Hello there!", true, "#333", "#fff"),
-        ]; */
-
-        return Ok(messages2);
+        return Ok(messages);
     }
 
     /// <summary>
@@ -128,14 +125,13 @@ public class HomeMessageController(
     [HttpDelete("messages/{id}")]
     public async Task<IActionResult> DeleteMessageAsync(string id)
     {
-        Plugin.Instance!.Logger.LogInformation("Deleted message {Id}", id);
-
         var authInfo = await _auth.GetAuthorizationInfo(Request).ConfigureAwait(false);
         if (!authInfo.IsAuthenticated || authInfo.UserId == Guid.Empty || authInfo.IsApiKey)
         {
             return Unauthorized();
         }
 
+        _logger.LogInformation("Deleted message {Id}", id);
         _dismissedStore.Add(
             new Dismissed(Guid.NewGuid().ToString(), id, authInfo.UserId.ToString())
         );
@@ -151,16 +147,11 @@ public class HomeMessageController(
     [AllowAnonymous]
     public IActionResult ClientJs()
     {
-        using var s = Assembly
-            .GetExecutingAssembly()
-            .GetManifestResourceStream("Jellyfin.Plugin.HomeMessage.Web.js.build.home.js");
+        string resourceName = "Jellyfin.Plugin.HomeMessage.Web.js.build.home.js";
+        using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
         if (s is null)
         {
-            Plugin.Instance!.Logger.Log(
-                LogLevel.Error,
-                "Could not find embedded resource {Resource}",
-                "Jellyfin.Plugin.HomeMessage.Web.js.home.js"
-            );
+            _logger.LogError("Could not find embedded resource {Resource}", resourceName);
             return NotFound();
         }
 
