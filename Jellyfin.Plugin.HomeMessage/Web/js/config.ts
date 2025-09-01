@@ -2,6 +2,7 @@ import { Message, MessageInput } from './@types/Message';
 import { formValuesAll } from './utils';
 
 (async () => {
+  // @ts-ignore
   const { ApiClient, Dashboard } = window;
 
   class HomeMessageConfig {

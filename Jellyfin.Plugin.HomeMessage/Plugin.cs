@@ -1,7 +1,6 @@
 using System;
 using System.Collections.Generic;
 using Jellyfin.Plugin.HomeMessage.Configuration;
-using Jellyfin.Plugin.HomeMessage.Html;
 using MediaBrowser.Common.Configuration;
 using MediaBrowser.Common.Plugins;
 using MediaBrowser.Controller.Configuration;
@@ -37,10 +36,6 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
         Logger = logger;
         ServiceProvider = serviceProvider;
         ServerConfigurationManager = serverConfigurationManager;
-
-        // Inject the HTML into the home page.
-        var htmlInjector = new HtmlInjector(paths, logger);
-        htmlInjector.Inject();
     }
 
     /// <summary>

@@ -1,5 +1,6 @@
 using System.IO;
 using System.Reflection;
+using System.Threading.Tasks;
 using AngleSharp;
 using AngleSharp.Dom;
 using MediaBrowser.Common.Configuration;
@@ -12,7 +13,7 @@ namespace Jellyfin.Plugin.HomeMessage.Html;
 /// </summary>
 /// <param name="applicationPaths">Instance of the <see cref="IApplicationPaths"/> interface.</param>
 /// <param name="logger">Instance of the <see cref="ILogger"/> interface.</param>
-public class HtmlInjector(IApplicationPaths applicationPaths, ILogger logger)
+public class HtmlInjector(IApplicationPaths applicationPaths, ILogger<HtmlInjector> logger)
 {
     /// <summary>
     /// Instance of the <see cref="IApplicationPaths"/> interface.
@@ -29,25 +30,13 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger logger)
     /// </summary>
     public async void Inject()
     {
-        if (string.IsNullOrWhiteSpace(_applicationPaths.WebPath))
+        var indexFile = GetIndexFilePath();
+        if (string.IsNullOrWhiteSpace(indexFile))
         {
-            _logger.LogError("Could not find web path");
             return;
         }
 
-        var indexFile = Path.Combine(_applicationPaths.WebPath, "index.html");
-        if (!File.Exists(indexFile))
-        {
-            _logger.LogError("Could not find index.html");
-            return;
-        }
-
-        var context = BrowsingContext.New(AngleSharp.Configuration.Default);
-        string indexContents = File.ReadAllText(indexFile);
-        var document = await context
-            .OpenAsync(req => req.Content(indexContents))
-            .ConfigureAwait(false);
-
+        var document = await GetDomDocument(indexFile).ConfigureAwait(false);
         var body = document.QuerySelector("body");
         if (body == null)
         {
@@ -59,6 +48,34 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger logger)
         InjectStyles(document, body);
         File.WriteAllText(indexFile, document.DocumentElement.OuterHtml);
         _logger.LogInformation("Injected scripts and styles into {File}.", indexFile);
+    }
+
+    /// <summary>
+    /// Removes the HTML that was injected into the home page.
+    /// </summary>
+    public async void Cleanup()
+    {
+        var indexFile = GetIndexFilePath();
+        if (string.IsNullOrWhiteSpace(indexFile))
+        {
+            return;
+        }
+
+        var document = await GetDomDocument(indexFile).ConfigureAwait(false);
+        var body = document.QuerySelector("body");
+        if (body == null)
+        {
+            _logger.LogError("Could not find body element in {File}", indexFile);
+            return;
+        }
+
+        var foundJs = body.QuerySelector("#home-message-script");
+        foundJs?.Remove();
+        var foundCss = body.QuerySelector("#home-message-styles");
+        foundCss?.Remove();
+
+        File.WriteAllText(indexFile, document.DocumentElement.OuterHtml);
+        _logger.LogInformation("Cleaned up scripts and styles from {File}.", indexFile);
     }
 
     /// <summary>
@@ -78,8 +95,8 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger logger)
             return;
         }
 
-        var found = body.QuerySelector("#home-message-script");
-        found?.Remove();
+        var foundJs = body.QuerySelector("#home-message-script");
+        foundJs?.Remove();
 
         var script = document.CreateElement("script");
         script.Id = "home-message-script";
@@ -135,5 +152,43 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger logger)
         }
 
         return new StreamReader(s);
+    }
+
+    /// <summary>
+    /// Gets the full file path to the index.html file.
+    /// </summary>
+    /// <returns>The index file path.</returns>
+    private string GetIndexFilePath()
+    {
+        if (string.IsNullOrWhiteSpace(_applicationPaths.WebPath))
+        {
+            _logger.LogError("Could not find web path");
+            return string.Empty;
+        }
+
+        var indexFile = Path.Combine(_applicationPaths.WebPath, "index.html");
+        if (!File.Exists(indexFile))
+        {
+            _logger.LogError("Could not find index.html");
+            return string.Empty;
+        }
+
+        return indexFile;
+    }
+
+    /// <summary>
+    /// Gets the DOM document for the given file.
+    /// </summary>
+    /// <param name="indexFile">The index file.</param>
+    /// <returns>The document.</returns>
+    private static async Task<IDocument> GetDomDocument(string indexFile)
+    {
+        var context = BrowsingContext.New(AngleSharp.Configuration.Default);
+        string indexContents = await File.ReadAllTextAsync(indexFile).ConfigureAwait(false);
+        var document = await context
+            .OpenAsync(req => req.Content(indexContents))
+            .ConfigureAwait(false);
+
+        return document;
     }
 }

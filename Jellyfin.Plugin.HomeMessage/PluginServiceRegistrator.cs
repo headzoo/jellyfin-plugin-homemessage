@@ -1,3 +1,4 @@
+using Jellyfin.Plugin.HomeMessage.Html;
 using Jellyfin.Plugin.HomeMessage.Store;
 using MediaBrowser.Controller;
 using MediaBrowser.Controller.Plugins;
@@ -22,5 +23,7 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
     {
         serviceCollection.AddSingleton<MessageStore>();
         serviceCollection.AddSingleton<DismissedStore>();
+        serviceCollection.AddSingleton<HtmlInjector>();
+        serviceCollection.AddHostedService<ShutdownAwareService>();
     }
 }
