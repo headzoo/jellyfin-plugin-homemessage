@@ -8,10 +8,10 @@
     "format:check": "prettier \"**/*.{js,jsx,ts,tsx,json,css,scss,md,html}\" --check",
     "sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
     "watch:sass": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
-    "build": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap",
-    "build:prod": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --minify --sourcemap",
+    "build": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts Jellyfin.Plugin.HomeMessage/Web/js/config.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap",
+    "build:prod": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts Jellyfin.Plugin.HomeMessage/Web/js/config.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --minify --sourcemap",
     "watch:typecheck": "tsc -w --noEmit",
-    "watch:esbuild": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap --watch",
+    "watch:esbuild": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts Jellyfin.Plugin.HomeMessage/Web/js/config.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap --watch",
     "dev": "concurrently -k \"npm:watch:*\""
   },
   "keywords": [],

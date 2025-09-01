@@ -25,3 +25,24 @@ export const createElement = (
 
   return el;
 };
+
+type Primitive = string | File;
+type FormValue = Primitive | Primitive[];
+type FormObject = Record<string, FormValue>;
+
+/**
+ * Serializes a form into a FormData object.
+ *
+ * @param form The form to serialize.
+ */
+export function formValuesAll(form: HTMLFormElement): FormObject {
+  const fd = new FormData(form);
+  const obj: FormObject = {};
+  // De-duplicate keys, then decide single vs array
+  for (const name of new Set(fd.keys() as Iterable<string>)) {
+    const all = fd.getAll(name); // (string | File)[]
+    obj[name] = all.length > 1 ? all : all[0]!;
+  }
+
+  return obj;
+}

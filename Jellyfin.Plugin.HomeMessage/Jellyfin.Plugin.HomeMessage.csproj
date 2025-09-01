@@ -29,6 +29,8 @@
     <EmbeddedResource Include="Web\js\build\home.js.map" />
     <EmbeddedResource Include="Web\js\build\boot.js" />
     <EmbeddedResource Include="Web\js\build\boot.js.map" />
+    <EmbeddedResource Include="Web\js\build\config.js" />
+    <EmbeddedResource Include="Web\js\build\config.js.map" />
     <EmbeddedResource Include="Web\css\build\home.css" />
     <EmbeddedResource Include="Web\css\build\home.css.map" />
   </ItemGroup>

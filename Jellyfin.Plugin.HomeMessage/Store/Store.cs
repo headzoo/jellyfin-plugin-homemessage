@@ -59,7 +59,7 @@ public abstract class Store<T>
     /// Adds the given object to the cache and writes it to the database.
     /// </summary>
     /// <param name="obj">The object to add.</param>
-    public void Write(T obj)
+    public void Add(T obj)
     {
         _cache.Add(obj);
         File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));

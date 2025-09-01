@@ -5,6 +5,8 @@ declare global {
       getJSON: <T = unknown>(url: string) => Promise<T>;
       ajax: (options: AjaxOptions) => Promise<AjaxResponse>;
     };
+
+    Dashboard: any;
   }
 }
 

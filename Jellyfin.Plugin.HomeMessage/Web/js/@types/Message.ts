@@ -39,3 +39,16 @@ export interface Message {
    */
   TimeEnd?: number;
 }
+
+/**
+ * Represents a message input.
+ */
+export interface MessageInput {
+  Title: string;
+  Text: string;
+  Dismissible: boolean;
+  BgColor: string;
+  TextColor: string;
+  TimeStart: number | null;
+  TimeEnd: number | null;
+}

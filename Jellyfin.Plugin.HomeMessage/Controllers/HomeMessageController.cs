@@ -1,8 +1,10 @@
 using System;
 using System.IO;
+using System.Linq;
 using System.Reflection;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.HomeMessage.Models;
+using Jellyfin.Plugin.HomeMessage.Models.Dto;
 using Jellyfin.Plugin.HomeMessage.Store;
 using MediaBrowser.Controller.Net;
 using Microsoft.AspNetCore.Authorization;
@@ -54,22 +56,11 @@ public class HomeMessageController(
     /// Require a logged-in session (the home screen is behind auth anyway).
     /// </summary>
     /// <returns>The response.</returns>
-    [HttpGet]
+    [HttpGet("config")]
     [Authorize]
-    public ActionResult Get()
+    public ActionResult GetConfig()
     {
-        var cfg = Plugin.Instance!.Configuration;
-
-        return Ok(
-            new
-            {
-                message = cfg.Message,
-                dismissible = cfg.Dismissible,
-                bgColor = cfg.BgColor,
-                textColor = cfg.TextColor,
-                position = cfg.Position,
-            }
-        );
+        return Ok(_messageStore.GetAll());
     }
 
     /// <summary>
@@ -77,22 +68,27 @@ public class HomeMessageController(
     /// </summary>
     /// <param name="req">The request body.</param>
     /// <returns>The response.</returns>
-    [HttpPost("save")]
-    [Authorize(Policy = "RequiresElevation")] // admin only
-    public ActionResult Save([FromBody] SaveRequest req)
+    [HttpPost("config")]
+    [Authorize(Policy = "RequiresElevation")]
+    public ActionResult SaveConfig([FromBody] MessageInput req)
     {
         if (req is null)
         {
             return BadRequest();
         }
 
-        var cfg = Plugin.Instance!.Configuration;
-        cfg.Message = req.Message ?? cfg.Message;
-        cfg.Dismissible = req.Dismissible;
-        cfg.BgColor = req.BgColor ?? cfg.BgColor;
-        cfg.TextColor = req.TextColor ?? cfg.TextColor;
-        cfg.Position = req.Position ?? cfg.Position;
-        Plugin.Instance!.UpdateConfiguration(cfg);
+        var message = new Message(
+            Guid.NewGuid().ToString(),
+            req.Title,
+            req.Text,
+            req.Dismissible,
+            req.BgColor,
+            req.TextColor,
+            req.TimeStart,
+            req.TimeEnd
+        );
+        _messageStore.Add(message);
+        _logger.LogInformation("Saved message {Id}", message.Id);
 
         return NoContent();
     }
@@ -123,6 +119,7 @@ public class HomeMessageController(
     /// <param name="id">The ID of the message.</param>
     /// <returns>The response.</returns>
     [HttpDelete("messages/{id}")]
+    [Authorize]
     public async Task<IActionResult> DeleteMessageAsync(string id)
     {
         var authInfo = await _auth.GetAuthorizationInfo(Request).ConfigureAwait(false);
@@ -132,7 +129,7 @@ public class HomeMessageController(
         }
 
         _logger.LogInformation("Deleted message {Id}", id);
-        _dismissedStore.Write(
+        _dismissedStore.Add(
             new Dismissed(Guid.NewGuid().ToString(), id, authInfo.UserId.ToString())
         );
 
@@ -148,6 +145,28 @@ public class HomeMessageController(
     public IActionResult ClientJs()
     {
         string resourceName = "Jellyfin.Plugin.HomeMessage.Web.js.build.home.js";
+        using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+        if (s is null)
+        {
+            _logger.LogError("Could not find embedded resource {Resource}", resourceName);
+            return NotFound();
+        }
+
+        using var r = new StreamReader(s);
+        Response.Headers.CacheControl = "no-store"; // dev-friendly
+
+        return Content(r.ReadToEnd(), "application/javascript");
+    }
+
+    /// <summary>
+    /// Gets the client-side JavaScript.
+    /// </summary>
+    /// <returns>The response.</returns>
+    [HttpGet("js/build/config.js")]
+    [AllowAnonymous]
+    public IActionResult GetConfigJs()
+    {
+        string resourceName = "Jellyfin.Plugin.HomeMessage.Web.js.build.config.js";
         using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
         if (s is null)
         {

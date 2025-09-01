@@ -2,8 +2,8 @@ import { Message } from './@types/Message';
 import { createElement } from './utils';
 
 (async () => {
-  const cssClassPrefix = 'home-message';
   const { ApiClient } = window;
+  const cssClassPrefix = 'home-message';
 
   /**
    * Displays a message on the home page.
