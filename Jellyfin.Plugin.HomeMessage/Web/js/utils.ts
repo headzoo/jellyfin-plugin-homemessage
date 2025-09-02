@@ -46,3 +46,60 @@ export function formValuesAll(form: HTMLFormElement): FormObject {
 
   return obj;
 }
+
+/**
+ * Sets the inner HTML of an element.
+ *
+ * @param el The element.
+ * @param html The HTML to set.
+ */
+export function setHTML(el: HTMLElement | null, html: string) {
+  if (!el) {
+    return;
+  }
+
+  el.innerHTML = html;
+}
+
+/**
+ * Sets the value of an input element.
+ *
+ * @param el The form element.
+ * @param value The value to set.
+ */
+export function setValue(el: HTMLInputElement | HTMLSelectElement | null, value: string) {
+  if (!el) {
+    return;
+  }
+
+  el.value = value;
+}
+
+/**
+ * Sets the checked state of an input element.
+ *
+ * @param el The form element.
+ * @param checked The value to set.
+ */
+export function setChecked(el: HTMLInputElement | null, checked: boolean) {
+  if (!el) {
+    return;
+  }
+
+  el.checked = checked;
+}
+
+/**
+ * Sets the value of an attribute on an element.
+ *
+ * @param el The element.
+ * @param name The attribute name.
+ * @param value The value to set.
+ */
+export function setAttribute(el: HTMLElement | null, name: string, value: string) {
+  if (!el) {
+    return;
+  }
+
+  el.setAttribute(name, value);
+}

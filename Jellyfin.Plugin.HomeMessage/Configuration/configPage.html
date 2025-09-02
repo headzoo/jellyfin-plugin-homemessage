@@ -9,47 +9,126 @@
 <body>
     <div data-role="page" class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
         data-require="emby-input,emby-textarea,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-radio">
+        <style>
+            #home-message-config-form {
+                margin-bottom: 2em;
+            }
+
+            #home-message-config-messages {
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            #home-message-config-messages li {
+                margin-bottom: 1em;
+                padding: 1em;
+                border: 1px solid #6b6b6b;
+                border-radius: 0.25em;
+                list-style: none;
+                text-align: left;
+            }
+
+            .home-message-config-messages-item-heading {
+                display: flex;
+                justify-content: space-between;
+                align-items: flex-end;
+            }
+
+            .home-message-config-messages-item-heading-title {
+                margin: 0 0 0.25em 0;
+                font-size: 1.2em;
+                line-height: 1.2em;
+            }
+
+            .home-message-config-messages-item-heading button {
+                background: none;
+                border: none;
+                color: inherit;
+                font-size: 2rem;
+                cursor: pointer;
+            }
+
+            .home-message-config-messages-item-heading button.home-message-config-messages-item-heading-close-btn {
+                font-size: 2.5rem;
+            }
+        </style>
         <div data-role="content">
             <div class="content-primary">
                 <h2>Home Messages</h2>
 
-                <form id="home-message-form">
-                    <fieldset>
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-title">Title</label>
-                            <input name="title" is="emby-input" id="input-title" type="text" />
-                        </div>
+                <form id="home-message-config-form" class="configForm">
+                    <h3>Add Message</h3>
+                    <input type="hidden" name="id" value="" />
 
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-message">Message</label>
-                            <textarea name="message" is="emby-textarea" class="emby-input emby-textarea"
-                                id="input-message" rows="5"></textarea>
-                        </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-title">Title</label>
+                        <input name="title" is="emby-input" id="input-title" type="text" />
+                    </div>
 
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-bg-color">Background color</label>
-                            <input name="bgColor" is="emby-input" id="input-bg-color" type="text" />
-                        </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-message">Message</label>
+                        <textarea name="message" is="emby-textarea" class="emby-input emby-textarea" id="input-message"
+                            rows="5"></textarea>
+                    </div>
 
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-text-color">Text color</label>
-                            <input name="textColor" is="emby-input" id="input-text-color" type="text" />
-                        </div>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-bg-color">Background color</label>
+                        <input name="bgColor" type="color" is="emby-input" id="input-bg-color" style="width: 50px" />
+                    </div>
 
-                        <div class="checkboxContainer checkboxContainer-withDescription">
-                            <label class="inputLabel inputLabelUnfocused" for="input-dismissible">
-                                <input name="dismissible" is="emby-checkbox" id="input-dismissible" type="checkbox" />
-                                <span>Dismissible</span>
-                            </label>
-                        </div>
-                    </fieldset>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-text-color">Text color</label>
+                        <input name="textColor" type="color" is="emby-input" id="input-text-color"
+                            style="width: 50px" />
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-time-start">Start time</label>
+                        <input name="timeStart" type="datetime-local" is="emby-input" id="input-time-start" />
+                    </div>
+
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-time-end">Start end</label>
+                        <input name="timeEnd" type="datetime-local" is="emby-input" id="input-time-end" />
+                    </div>
+
+                    <div class="checkboxContainer checkboxContainer-withDescription">
+                        <label class="inputLabel inputLabelUnfocused" for="input-dismissible">
+                            <input name="dismissible" is="emby-checkbox" id="input-dismissible" type="checkbox" />
+                            <span>Dismissible</span>
+                        </label>
+                    </div>
 
                     <div>
-                        <button is="emby-button" type="submit" class="raised button-submit block emby-button">
+                        <button id="home-message-submit-btn" is="emby-button" type="submit"
+                            class="raised button-submit block emby-button">
                             <span>Add</span>
                         </button>
                     </div>
                 </form>
+
+                <h3>Existing Messages</h3>
+                <ul id="home-message-config-messages"></ul>
+
+                <template id="home-message-item-template">
+                    <li>
+                        <div class="home-message-config-messages-item-heading" data-message-id="${message.Id}">
+                            <div>
+                                <h4 class="home-message-config-messages-item-heading-title">${message.Title}</h4>
+                                <time>${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}</time>
+                            </div>
+                            <div>
+                                <button title="Edit Message"
+                                    class="home-message-config-messages-item-heading-edit-btn">✎</button>
+                                <button title="Delete Message"
+                                    class="home-message-config-messages-item-heading-close-btn">&times;</button>
+                            </div>
+                        </div>
+
+                        <p>${message.Text}</p>
+                    </li>
+                </template>
 
                 <script>
                     const url = ApiClient.getUrl('HomeMessage/js/build/config.js');

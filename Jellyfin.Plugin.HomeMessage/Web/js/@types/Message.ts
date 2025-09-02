@@ -38,6 +38,11 @@ export interface Message {
    * The time when the message should be hidden.
    */
   TimeEnd?: number;
+
+  /**
+   * Unix timestamp of when the message was created.
+   */
+  CreatedTime: number;
 }
 
 /**

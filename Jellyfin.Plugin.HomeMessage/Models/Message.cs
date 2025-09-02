@@ -21,5 +21,7 @@ public record Message(
     // The time when the message should be shown.
     int? TimeStart,
     // The time when the message should be hidden.
-    int? TimeEnd
+    int? TimeEnd,
+    // Unix timestamp of when the message was created.
+    long CreatedTime
 ) : IHasId;

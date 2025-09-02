@@ -1,8 +1,10 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Text.Json;
 using MediaBrowser.Controller;
+using Microsoft.Extensions.Logging;
 
 namespace Jellyfin.Plugin.HomeMessage.Store;
 
@@ -32,7 +34,6 @@ public abstract class Store<T>
     {
         ArgumentNullException.ThrowIfNull(paths);
         var dir = Path.Combine(paths.DataPath, "plugins", "HomeMessage");
-
         Directory.CreateDirectory(dir);
         _dbPath = Path.Combine(dir, filename);
         if (File.Exists(_dbPath))
@@ -45,6 +46,16 @@ public abstract class Store<T>
     /// Gets the cache.
     /// </summary>
     protected IReadOnlyList<T> Cache => _cache;
+
+    /// <summary>
+    /// Gets the message with the given ID.
+    /// </summary>
+    /// <param name="id">The ID of the message.</param>
+    /// <returns>The message.</returns>
+    public T? Get(string id)
+    {
+        return _cache.FirstOrDefault(m => m.Id == id);
+    }
 
     /// <summary>
     /// Gets all dismissed state from the database.
@@ -66,12 +77,31 @@ public abstract class Store<T>
     }
 
     /// <summary>
+    /// Updates the given object in the cache and writes it to the database.
+    /// </summary>
+    /// <param name="obj">The object to update.</param>
+    public void Update(T obj)
+    {
+        var existing =
+            _cache.FirstOrDefault(m => m.Id == obj.Id)
+            ?? throw new InvalidOperationException("Object not found in cache");
+        _cache.Remove(existing);
+        _cache.Add(obj);
+        File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
+    }
+
+    /// <summary>
     /// Removes the given object from the cache and writes it to the database.
     /// </summary>
     /// <param name="id">The ID of the object to remove.</param>
     public void Remove(string id)
     {
-        _cache.RemoveAll(m => m.Id == id);
+        var removed = _cache.RemoveAll(m => m.Id == id);
+        Plugin.Instance?.Logger.Log(
+            Microsoft.Extensions.Logging.LogLevel.Information,
+            "Removed {Count} message(s) from cache",
+            removed
+        );
         File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
     }
 }

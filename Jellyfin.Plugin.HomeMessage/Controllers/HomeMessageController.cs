@@ -56,9 +56,9 @@ public class HomeMessageController(
     /// Require a logged-in session (the home screen is behind auth anyway).
     /// </summary>
     /// <returns>The response.</returns>
-    [HttpGet("config")]
+    [HttpGet("config/messages")]
     [Authorize]
-    public ActionResult GetConfig()
+    public ActionResult GetMessages()
     {
         return Ok(_messageStore.GetAll());
     }
@@ -68,9 +68,9 @@ public class HomeMessageController(
     /// </summary>
     /// <param name="req">The request body.</param>
     /// <returns>The response.</returns>
-    [HttpPost("config")]
+    [HttpPost("config/messages")]
     [Authorize(Policy = "RequiresElevation")]
-    public ActionResult SaveConfig([FromBody] MessageInput req)
+    public ActionResult SaveMessage([FromBody] MessageInput req)
     {
         if (req is null)
         {
@@ -85,12 +85,66 @@ public class HomeMessageController(
             req.BgColor,
             req.TextColor,
             req.TimeStart,
-            req.TimeEnd
+            req.TimeEnd,
+            DateTimeOffset.UtcNow.ToUnixTimeSeconds()
         );
         _messageStore.Add(message);
         _logger.LogInformation("Saved message {Id}", message.Id);
 
-        return NoContent();
+        return Ok(message);
+    }
+
+    /// <summary>
+    /// Updates an existing message.
+    /// </summary>
+    /// <param name="req">The message input.</param>
+    /// <param name="id">The ID of the message.</param>
+    /// <returns>The response.</returns>
+    [HttpPost("config/messages/{id}")]
+    [Authorize(Policy = "RequiresElevation")]
+    public IActionResult UpdateMessage([FromBody] MessageInput req, string id)
+    {
+        if (req is null)
+        {
+            return BadRequest();
+        }
+
+        var message = _messageStore.Get(id);
+        if (message is null)
+        {
+            return NotFound();
+        }
+
+        var updated = new Message(
+            message.Id,
+            req.Title,
+            req.Text,
+            req.Dismissible,
+            req.BgColor,
+            req.TextColor,
+            req.TimeStart,
+            req.TimeEnd,
+            message.CreatedTime
+        );
+        _messageStore.Update(updated);
+        _logger.LogInformation("Updated message {Id}", id);
+
+        return Ok(updated);
+    }
+
+    /// <summary>
+    /// Deletes a message.
+    /// </summary>
+    /// <param name="id">The ID of the message.</param>
+    /// <returns>The response.</returns>
+    [HttpDelete("config/messages/{id}")]
+    [Authorize(Policy = "RequiresElevation")]
+    public IActionResult DeleteMessage(string id)
+    {
+        _logger.LogInformation("Deleted message {Id}", id);
+        _messageStore.Remove(id);
+
+        return Ok("Message deleted");
     }
 
     /// <summary>
@@ -120,7 +174,7 @@ public class HomeMessageController(
     /// <returns>The response.</returns>
     [HttpDelete("messages/{id}")]
     [Authorize]
-    public async Task<IActionResult> DeleteMessageAsync(string id)
+    public async Task<IActionResult> DismissMessageAsync(string id)
     {
         var authInfo = await _auth.GetAuthorizationInfo(Request).ConfigureAwait(false);
         if (!authInfo.IsAuthenticated || authInfo.UserId == Guid.Empty || authInfo.IsApiKey)
@@ -128,7 +182,7 @@ public class HomeMessageController(
             return Unauthorized();
         }
 
-        _logger.LogInformation("Deleted message {Id}", id);
+        _logger.LogInformation("Dismissed message {Id}", id);
         _dismissedStore.Add(
             new Dismissed(Guid.NewGuid().ToString(), id, authInfo.UserId.ToString())
         );
