@@ -40,8 +40,6 @@ jobs:
       - name: Package with JPRM
         id: jprm
         uses: oddstr13/jellyfin-plugin-repository-manager@v1.1.1
-        with:
-          dotnet-target: net8.0
 
       # Attach the plugin zip (and checksum if present) to the GitHub release
       - name: Upload release assets
