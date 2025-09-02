@@ -8,8 +8,22 @@
     <Nullable>enable</Nullable>
     <AnalysisMode>AllEnabledByDefault</AnalysisMode>
     <CodeAnalysisRuleSet>../jellyfin.ruleset</CodeAnalysisRuleSet>
-    <CopyLocalLockFileAssemblies>true</CopyLocalLockFileAssemblies>
   </PropertyGroup>
+  <!-- Copy ONLY AngleSharp.dll next to the plugin DLL -->
+  <Target Name="CopyOnlyAngleSharp" AfterTargets="Build">
+    <!-- Resolve the actual path of AngleSharp from package refs -->
+    <ItemGroup>
+      <_AngleSharpFromRefs
+        Include="@(ReferencePath)"
+        Condition="'%(Filename)%(Extension)' == 'AngleSharp.dll'"
+      />
+    </ItemGroup>
+    <Copy
+      SourceFiles="@(_AngleSharpFromRefs)"
+      DestinationFolder="$(OutputPath)"
+      SkipUnchangedFiles="true"
+    />
+  </Target>
   <ItemGroup>
     <PackageReference Include="AngleSharp" Version="1.3.0" />
     <PackageReference Include="Jellyfin.Controller" Version="10.9.11" />

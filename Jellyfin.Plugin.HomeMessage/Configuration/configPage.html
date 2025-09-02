@@ -22,11 +22,23 @@
 
             #home-message-config-messages li {
                 margin-bottom: 1em;
-                padding: 1em;
+                padding: 0;
                 border: 1px solid #6b6b6b;
                 border-radius: 0.25em;
                 list-style: none;
                 text-align: left;
+            }
+
+            .home-message-config-messages-item-body {
+                padding: 1em;
+            }
+
+            .home-message-config-messages-item-body p {
+                margin: 0.5rem 0;
+            }
+
+            .home-message-config-messages-item-body p:last-child {
+                margin-bottom: 0;
             }
 
             .home-message-config-messages-item-heading {
@@ -36,9 +48,12 @@
             }
 
             .home-message-config-messages-item-heading-title {
-                margin: 0 0 0.25em 0;
-                font-size: 1.2em;
-                line-height: 1.2em;
+                margin: 0 0 0.15em 0;
+                font-size: 1.4em;
+            }
+
+            .home-message-config-messages-item-heading-time {
+                font-size: 0.8em;
             }
 
             .home-message-config-messages-item-heading button {
@@ -51,6 +66,27 @@
 
             .home-message-config-messages-item-heading button.home-message-config-messages-item-heading-close-btn {
                 font-size: 2.5rem;
+            }
+
+            .home-message-config-recent-colors-container {
+                margin-top: 0.25rem;
+            }
+
+            .home-message-config-recent-colors-list {
+                display: block;
+                list-style: none;
+                padding: 0;
+                margin: 0;
+            }
+
+            .home-message-config-recent-colors-item {
+                display: inline-block;
+                width: 1.5rem;
+                height: 1.5rem;
+                border: 2px solid #333;
+                border-radius: 0.25rem;
+                margin-right: 0.25rem;
+                cursor: pointer;
             }
         </style>
         <div data-role="content">
@@ -75,12 +111,22 @@
                     <div class="inputContainer">
                         <label class="inputLabel inputLabelUnfocused" for="input-bg-color">Background color</label>
                         <input name="bgColor" type="color" is="emby-input" id="input-bg-color" style="width: 50px" />
+                        <label>Recent colors</label>
+                        <div class="home-message-config-recent-colors-container">
+                            <ul id="home-message-config-recent-colors-list-bg"
+                                class="home-message-config-recent-colors-list"></ul>
+                        </div>
                     </div>
 
                     <div class="inputContainer">
                         <label class="inputLabel inputLabelUnfocused" for="input-text-color">Text color</label>
                         <input name="textColor" type="color" is="emby-input" id="input-text-color"
                             style="width: 50px" />
+                        <label>Recent colors</label>
+                        <div class="home-message-config-recent-colors-container">
+                            <ul id="home-message-config-recent-colors-list-text"
+                                class="home-message-config-recent-colors-list"></ul>
+                        </div>
                     </div>
 
                     <div class="inputContainer">
@@ -113,20 +159,24 @@
 
                 <template id="home-message-item-template">
                     <li>
-                        <div class="home-message-config-messages-item-heading" data-message-id="${message.Id}">
-                            <div>
-                                <h4 class="home-message-config-messages-item-heading-title">${message.Title}</h4>
-                                <time>${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}</time>
+                        <div class="home-message-config-messages-item-body">
+                            <div class="home-message-config-messages-item-heading" data-message-id="${message.Id}">
+                                <div>
+                                    <h4 class="home-message-config-messages-item-heading-title">${message.Title}</h4>
+                                    <time
+                                        class="home-message-config-messages-item-heading-time">${createdDate.toLocaleDateString()}
+                                        ${createdDate.toLocaleTimeString()}</time>
+                                </div>
+                                <div>
+                                    <button title="Edit Message"
+                                        class="home-message-config-messages-item-heading-edit-btn">✎</button>
+                                    <button title="Delete Message"
+                                        class="home-message-config-messages-item-heading-close-btn">&times;</button>
+                                </div>
                             </div>
-                            <div>
-                                <button title="Edit Message"
-                                    class="home-message-config-messages-item-heading-edit-btn">✎</button>
-                                <button title="Delete Message"
-                                    class="home-message-config-messages-item-heading-close-btn">&times;</button>
-                            </div>
-                        </div>
 
-                        <p>${message.Text}</p>
+                            <p>${message.Text}</p>
+                        </div>
                     </li>
                 </template>
 

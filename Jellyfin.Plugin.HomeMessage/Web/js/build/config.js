@@ -88,6 +88,7 @@
               this.ajax("GET", "config/messages").then((messages) => {
                 this.messages = messages;
                 this.renderMessages();
+                this.renderRecentColors();
               });
             };
             /**
@@ -105,6 +106,8 @@
                 TimeStart: values.timeStart ? new Date(values.timeStart.toString()).getTime() / 1e3 : null,
                 TimeEnd: values.timeEnd ? new Date(values.timeEnd.toString()).getTime() / 1e3 : null
               };
+              this.saveRecentBackgroundColor(message.BgColor);
+              this.saveRecentTextColor(message.TextColor);
               const isExisting = !!values.id;
               const url = isExisting ? `config/messages/${values.id}` : "config/messages";
               this.ajax("POST", url, message).then(() => {
@@ -124,6 +127,11 @@
                 const message = this.messages[i];
                 const createdDate = new Date(message.CreatedTime * 1e3);
                 const li = template.content.cloneNode(true);
+                setAttribute(
+                  li.querySelector(".home-message-config-messages-item-body"),
+                  "style",
+                  `background-color: ${message.BgColor}; color: ${message.TextColor}`
+                );
                 setAttribute(li.querySelector("[data-message-id]"), "data-message-id", message.Id);
                 setHTML(li.querySelector("h4"), message.Title);
                 setHTML(li.querySelector("p"), message.Text);
@@ -146,6 +154,39 @@
               for (let i = 0; i < closeBtns.length; i++) {
                 const btn = closeBtns[i];
                 btn.addEventListener("click", this.deleteMessage);
+              }
+            };
+            /**
+             * Renders the recent colors.
+             */
+            this.renderRecentColors = () => {
+              const backgroundColors = this.getRecentBackgroundColors();
+              const textColors = this.getRecentTextColors();
+              this.recentBackgroundColorsList.innerHTML = "";
+              this.recentTextColorsList.innerHTML = "";
+              for (let i = 0; i < backgroundColors.length; i++) {
+                const color = backgroundColors[i];
+                console.log(color);
+                const li = document.createElement("li");
+                li.title = "Select color";
+                li.style.backgroundColor = color;
+                li.classList.add("home-message-config-recent-colors-item");
+                li.addEventListener("click", () => {
+                  setValue(this.form.querySelector('input[name="bgColor"]'), color);
+                });
+                this.recentBackgroundColorsList.appendChild(li);
+              }
+              for (let i = 0; i < textColors.length; i++) {
+                const color = textColors[i];
+                const li = document.createElement("li");
+                li.title = "Select color";
+                li.style.backgroundColor = color;
+                li.classList.add("home-message-config-recent-colors-item");
+                li.addEventListener("click", () => {
+                  setValue(this.form.querySelector('input[name="textColor"]'), color);
+                  this.saveRecentTextColor(color);
+                });
+                this.recentTextColorsList.appendChild(li);
               }
             };
             /**
@@ -235,6 +276,78 @@
               const submitBtn = document.querySelector("#home-message-submit-btn span");
               submitBtn.textContent = "Add";
             };
+            /**
+             * Adds a color to the list of recently used background colors.
+             *
+             * Keeps the list to a maximum of 5 colors. Does not include the same color twice.
+             *
+             * @param color The color to save.
+             */
+            this.saveRecentBackgroundColor = (color) => {
+              const colors = localStorage.getItem("home-message-recent-background-color");
+              if (colors) {
+                const colorsList = JSON.parse(colors);
+                if (colorsList.includes(color)) {
+                  return;
+                }
+                colorsList.unshift(color);
+                if (colorsList.length > 5) {
+                  colorsList.pop();
+                }
+                localStorage.setItem("home-message-recent-background-color", JSON.stringify(colorsList));
+              } else {
+                localStorage.setItem("home-message-recent-background-color", JSON.stringify([color]));
+              }
+            };
+            /**
+             * Adds a color to the list of recently used text colors.
+             *
+             * Keeps the list to a maximum of 5 colors. Does not include the same color twice.
+             *
+             * @param color The color to save.
+             */
+            this.saveRecentTextColor = (color) => {
+              const colors = localStorage.getItem("home-message-recent-text-color");
+              if (colors) {
+                const colorsList = JSON.parse(colors);
+                if (colorsList.includes(color)) {
+                  return;
+                }
+                colorsList.unshift(color);
+                if (colorsList.length > 5) {
+                  colorsList.pop();
+                }
+                localStorage.setItem("home-message-recent-text-color", JSON.stringify(colorsList));
+              } else {
+                localStorage.setItem("home-message-recent-text-color", JSON.stringify([color]));
+              }
+            };
+            /**
+             * Returns the list of recently used background colors.
+             */
+            this.getRecentBackgroundColors = () => {
+              const colors = localStorage.getItem("home-message-recent-background-color");
+              if (colors) {
+                return JSON.parse(colors);
+              }
+              return [];
+            };
+            /**
+             * Returns the list of recently used text colors.
+             */
+            this.getRecentTextColors = () => {
+              const colors = localStorage.getItem("home-message-recent-text-color");
+              if (colors) {
+                return JSON.parse(colors);
+              }
+              return [];
+            };
+            this.recentBackgroundColorsList = document.getElementById(
+              "home-message-config-recent-colors-list-bg"
+            );
+            this.recentTextColorsList = document.getElementById(
+              "home-message-config-recent-colors-list-text"
+            );
             this.form = document.getElementById("home-message-config-form");
             this.form.addEventListener("submit", this.saveMessage);
             this.resetForm();
