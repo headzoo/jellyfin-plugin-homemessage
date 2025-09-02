@@ -56,9 +56,9 @@ jobs:
       - name: Generate & publish manifest.json
         uses: Kevinjil/jellyfin-plugin-repo-action@v0.4.3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-          path: docs/manifest.json
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          pagesBranch: main
+          pagesFile: docs/manifest.json
 
   publish-on-dispatch:
     if: github.event_name == 'workflow_dispatch'
