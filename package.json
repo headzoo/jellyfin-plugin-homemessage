@@ -4,6 +4,7 @@
   "description": "",
   "main": "index.js",
   "scripts": {
+    "build": "cd Jellyfin.Plugin.HomeMessage && dotnet publish -c Release -f net8.0",
     "sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
     "watch:sass": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
     "build:js": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts Jellyfin.Plugin.HomeMessage/Web/js/config.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap",
