@@ -1,16 +1,17 @@
 ---
-name: "Template"
-guid: "eb5d7894-8eef-4b36-aa6f-5d124e828ce1"
-version: "1.0.0.0"
+name: "Jellyfin.Plugin.HomeMessage"
+guid: "69d36d38-5615-4128-b2e0-30caf4c5ba86"
+version: "0.0.0.1"
 targetAbi: "10.9.0.0"
 framework: "net8.0"
-overview: "Short description about your plugin"
+overview: "A Jellyfin plugin that displays a message on the home page."
 description: >
-  This is a longer description that can span more than one
-  line and include details about your plugin.
+  Adds admin-configurable messages to the Jellyfin home page,
+  with scheduling and per-user dismiss tracking.
 category: "General"
-owner: "jellyfin"
+owner: "headzoo"
 artifacts:
 - "Jellyfin.Plugin.HomeMessage.dll"
+- "AngleSharp.dll"
 changelog: >
   changelog

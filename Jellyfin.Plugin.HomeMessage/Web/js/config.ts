@@ -8,6 +8,7 @@ import { formValuesAll, setHTML, setValue, setChecked, setAttribute } from './ut
   /**
    * The configuration page.
    *
+   * @see https://github.com/jellyfin-archive/jellyfin-apiclient-javascript
    * @see https://github.com/jellyfin/jellyfin-web/blob/808ece5db48b40bcf841e99c96adf5b8213d77e3/src/utils/dashboard.js#L236
    */
   class HomeMessageConfig {

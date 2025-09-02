@@ -1,3 +1,3 @@
 # Jellyfin.Plugin.HomeMessage
 
-A Jellyfin plugin that displays a message on the home page.
+Adds admin-configurable messages to the Jellyfin home page, with scheduling and per-user dismiss tracking.
