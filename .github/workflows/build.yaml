@@ -14,5 +14,29 @@ on:
   workflow_dispatch:
 
 jobs:
-  call:
-    uses: jellyfin/jellyfin-meta-plugins/.github/workflows/build.yaml@master
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Web assets: run your build.js first ---
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+          cache: "pnpm"   # You use pnpm
+      - name: Enable pnpm
+        run: corepack enable && corepack prepare pnpm@latest --activate
+      - name: Install deps
+        run: |
+          pnpm install --frozen-lockfile
+
+      # --- .NET build/packaging ---
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Build plugin
+        run: |
+          pnpm build
