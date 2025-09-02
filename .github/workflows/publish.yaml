@@ -52,6 +52,14 @@ jobs:
           files: |
             ${{ steps.jprm.outputs.artifact }}
 
+      # 👇 Generate docs/manifest.json in your default branch (e.g., main)
+      - name: Generate & publish manifest.json
+        uses: Kevinjil/jellyfin-plugin-repo-action@v0.4.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          path: docs/manifest.json
+
   publish-on-dispatch:
     if: github.event_name == 'workflow_dispatch'
     runs-on: ubuntu-latest
@@ -94,3 +102,11 @@ jobs:
           tag_name: ${{ github.ref_name }}
           generate_release_notes: true
           files: ${{ steps.jprm.outputs.artifact }}
+
+      # 👇 Generate docs/manifest.json in your default branch (e.g., main)
+      - name: Generate & publish manifest.json
+        uses: Kevinjil/jellyfin-plugin-repo-action@v0.4.3
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          branch: main
+          path: docs/manifest.json
