@@ -1,7 +1,7 @@
 ---
 name: "Jellyfin.Plugin.HomeMessage"
 guid: "69d36d38-5615-4128-b2e0-30caf4c5ba86"
-version: "0.0.0.2"
+version: "0.0.0.3"
 targetAbi: "10.9.0.0"
 framework: "net8.0"
 overview: "A Jellyfin plugin that displays a message on the home page."
