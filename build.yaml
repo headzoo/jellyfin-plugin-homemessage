@@ -11,7 +11,7 @@ description: >
 category: "General"
 owner: "headzoo"
 artifacts:
-- "Jellyfin.Plugin.HomeMessage.dll"
-- "AngleSharp.dll"
+- "dist/Jellyfin.Plugin.HomeMessage.dll"
+- "dist/AngleSharp.dll"
 changelog: >
   changelog
