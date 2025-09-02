@@ -59,7 +59,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           pagesBranch: main
           pagesFile: docs/manifest.json
-          repository: headzoo/jellyfin-home-message
+          repository: headzoo/jellyfin-plugin-homemessage
 
   publish-on-dispatch:
     if: github.event_name == 'workflow_dispatch'
@@ -108,6 +108,7 @@ jobs:
       - name: Generate & publish manifest.json
         uses: Kevinjil/jellyfin-plugin-repo-action@v0.4.3
         with:
-          github_token: ${{ secrets.GITHUB_TOKEN }}
-          branch: main
-          path: docs/manifest.json
+          githubToken: ${{ secrets.GITHUB_TOKEN }}
+          pagesBranch: main
+          pagesFile: docs/manifest.json
+          repository: headzoo/jellyfin-plugin-homemessage
