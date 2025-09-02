@@ -1,5 +1,12 @@
 import { Message, MessageInput } from './@types/Message';
-import { formValuesAll, setHTML, setValue, setChecked, setAttribute } from './utils';
+import {
+  formValuesAll,
+  setHTML,
+  setValue,
+  setChecked,
+  setAttribute,
+  paragraphsFromText,
+} from './utils';
 
 (async () => {
   // @ts-ignore
@@ -107,7 +114,7 @@ import { formValuesAll, setHTML, setValue, setChecked, setAttribute } from './ut
         );
         setAttribute(li.querySelector('[data-message-id]'), 'data-message-id', message.Id);
         setHTML(li.querySelector('h4'), message.Title);
-        setHTML(li.querySelector('p'), message.Text);
+        setHTML(li.querySelector('p'), paragraphsFromText(message.Text));
         setHTML(
           li.querySelector('time'),
           `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`,
@@ -140,30 +147,41 @@ import { formValuesAll, setHTML, setValue, setChecked, setAttribute } from './ut
       const textColors = this.getRecentTextColors();
 
       this.recentBackgroundColorsList.innerHTML = '';
-      this.recentTextColorsList.innerHTML = '';
-      for (let i = 0; i < backgroundColors.length; i++) {
-        const color = backgroundColors[i];
-        console.log(color);
-        const li = document.createElement('li');
-        li.title = 'Select color';
-        li.style.backgroundColor = color;
-        li.classList.add('home-message-config-recent-colors-item');
-        li.addEventListener('click', () => {
-          setValue(this.form.querySelector('input[name="bgColor"]'), color);
-        });
-        this.recentBackgroundColorsList.appendChild(li);
+      if (backgroundColors.length === 0) {
+        this.recentBackgroundColorsList.style.display = 'none';
+      } else {
+        this.recentBackgroundColorsList.style.display = 'block';
+        for (let i = 0; i < backgroundColors.length; i++) {
+          const color = backgroundColors[i];
+          console.log(color);
+          const li = document.createElement('li');
+          li.title = 'Select color';
+          li.style.backgroundColor = color;
+          li.classList.add('home-message-config-recent-colors-item');
+          li.addEventListener('click', () => {
+            setValue(this.form.querySelector('input[name="bgColor"]'), color);
+          });
+          this.recentBackgroundColorsList.appendChild(li);
+        }
       }
-      for (let i = 0; i < textColors.length; i++) {
-        const color = textColors[i];
-        const li = document.createElement('li');
-        li.title = 'Select color';
-        li.style.backgroundColor = color;
-        li.classList.add('home-message-config-recent-colors-item');
-        li.addEventListener('click', () => {
-          setValue(this.form.querySelector('input[name="textColor"]'), color);
-          this.saveRecentTextColor(color);
-        });
-        this.recentTextColorsList.appendChild(li);
+
+      this.recentTextColorsList.innerHTML = '';
+      if (textColors.length === 0) {
+        this.recentTextColorsList.style.display = 'none';
+      } else {
+        this.recentTextColorsList.style.display = 'block';
+        for (let i = 0; i < textColors.length; i++) {
+          const color = textColors[i];
+          const li = document.createElement('li');
+          li.title = 'Select color';
+          li.style.backgroundColor = color;
+          li.classList.add('home-message-config-recent-colors-item');
+          li.addEventListener('click', () => {
+            setValue(this.form.querySelector('input[name="textColor"]'), color);
+            this.saveRecentTextColor(color);
+          });
+          this.recentTextColorsList.appendChild(li);
+        }
       }
     };
 

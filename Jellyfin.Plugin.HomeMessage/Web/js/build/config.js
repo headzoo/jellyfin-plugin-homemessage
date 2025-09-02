@@ -41,7 +41,19 @@
     if (!el) {
       return;
     }
-    el.innerHTML = html;
+    if (typeof html === "string") {
+      el.innerHTML = html;
+      return;
+    }
+    if (Array.isArray(html)) {
+      el.innerHTML = "";
+      for (let i = 0; i < html.length; i++) {
+        el.appendChild(html[i]);
+      }
+      return;
+    }
+    el.innerHTML = "";
+    el.appendChild(html);
   }
   function setValue(el, value) {
     if (!el) {
@@ -60,6 +72,30 @@
       return;
     }
     el.setAttribute(name, value);
+  }
+  function paragraphsFromText(text, opts = {}) {
+    const { mode = "blankLineIsParagraph", keepEmpty = false, className, doc = document } = opts;
+    const frag = doc.createDocumentFragment();
+    if (text == null) return frag;
+    const normalized = String(text).replace(/\r\n?/g, "\n");
+    const chunks = mode === "everyLineIsParagraph" ? normalized.split("\n") : normalized.split(/\n{2,}/);
+    for (const raw of chunks) {
+      const paraText = mode === "everyLineIsParagraph" ? raw : raw.replace(/\n+$/g, "");
+      if (!keepEmpty && /^\s*$/.test(paraText)) continue;
+      const p = doc.createElement("p");
+      if (className) p.className = className;
+      if (mode === "everyLineIsParagraph") {
+        p.appendChild(doc.createTextNode(paraText));
+      } else {
+        const lines = paraText.split("\n");
+        lines.forEach((line, i) => {
+          if (i > 0) p.appendChild(doc.createElement("br"));
+          p.appendChild(doc.createTextNode(line));
+        });
+      }
+      frag.appendChild(p);
+    }
+    return frag;
   }
   var init_utils = __esm({
     "Jellyfin.Plugin.HomeMessage/Web/js/utils.ts"() {
@@ -134,7 +170,7 @@
                 );
                 setAttribute(li.querySelector("[data-message-id]"), "data-message-id", message.Id);
                 setHTML(li.querySelector("h4"), message.Title);
-                setHTML(li.querySelector("p"), message.Text);
+                setHTML(li.querySelector("p"), paragraphsFromText(message.Text));
                 setHTML(
                   li.querySelector("time"),
                   `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`
@@ -163,30 +199,40 @@
               const backgroundColors = this.getRecentBackgroundColors();
               const textColors = this.getRecentTextColors();
               this.recentBackgroundColorsList.innerHTML = "";
-              this.recentTextColorsList.innerHTML = "";
-              for (let i = 0; i < backgroundColors.length; i++) {
-                const color = backgroundColors[i];
-                console.log(color);
-                const li = document.createElement("li");
-                li.title = "Select color";
-                li.style.backgroundColor = color;
-                li.classList.add("home-message-config-recent-colors-item");
-                li.addEventListener("click", () => {
-                  setValue(this.form.querySelector('input[name="bgColor"]'), color);
-                });
-                this.recentBackgroundColorsList.appendChild(li);
+              if (backgroundColors.length === 0) {
+                this.recentBackgroundColorsList.style.display = "none";
+              } else {
+                this.recentBackgroundColorsList.style.display = "block";
+                for (let i = 0; i < backgroundColors.length; i++) {
+                  const color = backgroundColors[i];
+                  console.log(color);
+                  const li = document.createElement("li");
+                  li.title = "Select color";
+                  li.style.backgroundColor = color;
+                  li.classList.add("home-message-config-recent-colors-item");
+                  li.addEventListener("click", () => {
+                    setValue(this.form.querySelector('input[name="bgColor"]'), color);
+                  });
+                  this.recentBackgroundColorsList.appendChild(li);
+                }
               }
-              for (let i = 0; i < textColors.length; i++) {
-                const color = textColors[i];
-                const li = document.createElement("li");
-                li.title = "Select color";
-                li.style.backgroundColor = color;
-                li.classList.add("home-message-config-recent-colors-item");
-                li.addEventListener("click", () => {
-                  setValue(this.form.querySelector('input[name="textColor"]'), color);
-                  this.saveRecentTextColor(color);
-                });
-                this.recentTextColorsList.appendChild(li);
+              this.recentTextColorsList.innerHTML = "";
+              if (textColors.length === 0) {
+                this.recentTextColorsList.style.display = "none";
+              } else {
+                this.recentTextColorsList.style.display = "block";
+                for (let i = 0; i < textColors.length; i++) {
+                  const color = textColors[i];
+                  const li = document.createElement("li");
+                  li.title = "Select color";
+                  li.style.backgroundColor = color;
+                  li.classList.add("home-message-config-recent-colors-item");
+                  li.addEventListener("click", () => {
+                    setValue(this.form.querySelector('input[name="textColor"]'), color);
+                    this.saveRecentTextColor(color);
+                  });
+                  this.recentTextColorsList.appendChild(li);
+                }
               }
             };
             /**

@@ -23,14 +23,19 @@
             #home-message-config-messages li {
                 margin-bottom: 1em;
                 padding: 0;
-                border: 1px solid #6b6b6b;
-                border-radius: 0.25em;
                 list-style: none;
                 text-align: left;
             }
 
+            @media (min-width: 50em) {
+                #home-message-config-messages {
+                    max-width: 54em;
+                }
+            }
+
             .home-message-config-messages-item-body {
                 padding: 1em;
+                border-radius: 0.5em;
             }
 
             .home-message-config-messages-item-body p {
@@ -44,7 +49,7 @@
             .home-message-config-messages-item-heading {
                 display: flex;
                 justify-content: space-between;
-                align-items: flex-end;
+                align-items: flex-start;
             }
 
             .home-message-config-messages-item-heading-title {
@@ -57,15 +62,15 @@
             }
 
             .home-message-config-messages-item-heading button {
-                background: none;
-                border: none;
-                color: inherit;
-                font-size: 2rem;
+                background: #333;
+                border: 1px solid #999;
+                border-radius: 0.25rem;
+                box-shadow: 0 0 0.25rem #000;
+                color: #fff;
+                font-size: 1rem;
+                padding: 0.25rem 0.5rem;
+                margin-left: 0.25rem;
                 cursor: pointer;
-            }
-
-            .home-message-config-messages-item-heading button.home-message-config-messages-item-heading-close-btn {
-                font-size: 2.5rem;
             }
 
             .home-message-config-recent-colors-container {
@@ -111,8 +116,9 @@
                     <div class="inputContainer">
                         <label class="inputLabel inputLabelUnfocused" for="input-bg-color">Background color</label>
                         <input name="bgColor" type="color" is="emby-input" id="input-bg-color" style="width: 50px" />
-                        <label>Recent colors</label>
+
                         <div class="home-message-config-recent-colors-container">
+                            <label>Recent colors</label>
                             <ul id="home-message-config-recent-colors-list-bg"
                                 class="home-message-config-recent-colors-list"></ul>
                         </div>
@@ -122,8 +128,9 @@
                         <label class="inputLabel inputLabelUnfocused" for="input-text-color">Text color</label>
                         <input name="textColor" type="color" is="emby-input" id="input-text-color"
                             style="width: 50px" />
-                        <label>Recent colors</label>
+
                         <div class="home-message-config-recent-colors-container">
+                            <label>Recent colors</label>
                             <ul id="home-message-config-recent-colors-list-text"
                                 class="home-message-config-recent-colors-list"></ul>
                         </div>
@@ -169,9 +176,10 @@
                                 </div>
                                 <div>
                                     <button title="Edit Message"
-                                        class="home-message-config-messages-item-heading-edit-btn">✎</button>
+                                        class="home-message-config-messages-item-heading-edit-btn">
+                                        Edit</button>
                                     <button title="Delete Message"
-                                        class="home-message-config-messages-item-heading-close-btn">&times;</button>
+                                        class="home-message-config-messages-item-heading-close-btn">Delete</button>
                                 </div>
                             </div>
 

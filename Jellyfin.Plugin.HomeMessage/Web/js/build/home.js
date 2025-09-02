@@ -28,6 +28,48 @@
   };
 
   // Jellyfin.Plugin.HomeMessage/Web/js/utils.ts
+  function setHTML(el, html) {
+    if (!el) {
+      return;
+    }
+    if (typeof html === "string") {
+      el.innerHTML = html;
+      return;
+    }
+    if (Array.isArray(html)) {
+      el.innerHTML = "";
+      for (let i = 0; i < html.length; i++) {
+        el.appendChild(html[i]);
+      }
+      return;
+    }
+    el.innerHTML = "";
+    el.appendChild(html);
+  }
+  function paragraphsFromText(text, opts = {}) {
+    const { mode = "blankLineIsParagraph", keepEmpty = false, className, doc = document } = opts;
+    const frag = doc.createDocumentFragment();
+    if (text == null) return frag;
+    const normalized = String(text).replace(/\r\n?/g, "\n");
+    const chunks = mode === "everyLineIsParagraph" ? normalized.split("\n") : normalized.split(/\n{2,}/);
+    for (const raw of chunks) {
+      const paraText = mode === "everyLineIsParagraph" ? raw : raw.replace(/\n+$/g, "");
+      if (!keepEmpty && /^\s*$/.test(paraText)) continue;
+      const p = doc.createElement("p");
+      if (className) p.className = className;
+      if (mode === "everyLineIsParagraph") {
+        p.appendChild(doc.createTextNode(paraText));
+      } else {
+        const lines = paraText.split("\n");
+        lines.forEach((line, i) => {
+          if (i > 0) p.appendChild(doc.createElement("br"));
+          p.appendChild(doc.createTextNode(line));
+        });
+      }
+      frag.appendChild(p);
+    }
+    return frag;
+  }
   var createElement;
   var init_utils = __esm({
     "Jellyfin.Plugin.HomeMessage/Web/js/utils.ts"() {
@@ -35,14 +77,16 @@
         const el = document.createElement(tagName);
         const attr = Object.assign({}, attributes);
         if (attr.html) {
-          el.innerHTML = attr.html;
+          setHTML(el, attr.html);
           delete attr.html;
         }
         const keys = Object.keys(attr);
         for (let i = 0; i < keys.length; i++) {
           const key = keys[i];
           const value = attr[key];
-          el.setAttribute(key, value);
+          if (typeof value === "string") {
+            el.setAttribute(key, value);
+          }
         }
         return el;
       };
@@ -82,9 +126,15 @@
             html: message.Title
           });
           messageElement.appendChild(titleElement);
+          const createdDate = new Date(message.CreatedTime * 1e3);
+          const timeElement = createElement("time", {
+            class: `${cssClassPrefix}-time`,
+            html: `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`
+          });
+          messageElement.appendChild(timeElement);
           const textElement = createElement("p", {
             class: `${cssClassPrefix}-text`,
-            html: message.Text
+            html: paragraphsFromText(message.Text)
           });
           messageElement.appendChild(textElement);
           messageElements.appendChild(messageElement);

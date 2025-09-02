@@ -1,5 +1,5 @@
 import { Message } from './@types/Message';
-import { createElement } from './utils';
+import { createElement, paragraphsFromText } from './utils';
 
 (async () => {
   const { ApiClient } = window;
@@ -40,9 +40,16 @@ import { createElement } from './utils';
     });
     messageElement.appendChild(titleElement);
 
+    const createdDate = new Date(message.CreatedTime * 1000);
+    const timeElement = createElement('time', {
+      class: `${cssClassPrefix}-time`,
+      html: `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`,
+    });
+    messageElement.appendChild(timeElement);
+
     const textElement = createElement('p', {
       class: `${cssClassPrefix}-text`,
-      html: message.Text,
+      html: paragraphsFromText(message.Text),
     });
     messageElement.appendChild(textElement);
 

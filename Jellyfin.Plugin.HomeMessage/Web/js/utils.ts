@@ -6,13 +6,13 @@
  */
 export const createElement = (
   tagName: string,
-  attributes: Record<string, string> = {},
+  attributes: Record<string, string | HTMLElement[] | DocumentFragment> = {},
 ): HTMLElement => {
   const el = document.createElement(tagName);
 
   const attr = Object.assign({}, attributes);
   if (attr.html) {
-    el.innerHTML = attr.html;
+    setHTML(el, attr.html);
     delete attr.html;
   }
 
@@ -20,7 +20,9 @@ export const createElement = (
   for (let i = 0; i < keys.length; i++) {
     const key = keys[i];
     const value = attr[key];
-    el.setAttribute(key, value);
+    if (typeof value === 'string') {
+      el.setAttribute(key, value);
+    }
   }
 
   return el;
@@ -53,12 +55,26 @@ export function formValuesAll(form: HTMLFormElement): FormObject {
  * @param el The element.
  * @param html The HTML to set.
  */
-export function setHTML(el: HTMLElement | null, html: string) {
+export function setHTML(el: HTMLElement | null, html: string | HTMLElement[] | DocumentFragment) {
   if (!el) {
     return;
   }
 
-  el.innerHTML = html;
+  if (typeof html === 'string') {
+    el.innerHTML = html;
+    return;
+  }
+
+  if (Array.isArray(html)) {
+    el.innerHTML = '';
+    for (let i = 0; i < html.length; i++) {
+      el.appendChild(html[i]);
+    }
+    return;
+  }
+
+  el.innerHTML = '';
+  el.appendChild(html);
 }
 
 /**
@@ -102,4 +118,62 @@ export function setAttribute(el: HTMLElement | null, name: string, value: string
   }
 
   el.setAttribute(name, value);
+}
+
+/**
+ * Build <p> nodes from text with line breaks.
+ * - Blank lines separate paragraphs (default).
+ * - Single newlines inside a paragraph become <br>.
+ *
+ * @param text The text to parse.
+ * @param opts The options.
+ *   - mode: blankLineIsParagraph | everyLineIsParagraph (default: blankLineIsParagraph)
+ *   - keepEmpty: keep empty paragraphs if present (default: false)
+ *   - className: optional class for each <p> (default: undefined)
+ *   - doc: custom Document (e.g., for iframes) (default: document)
+ */
+export function paragraphsFromText(
+  text: string,
+  opts: {
+    mode?: 'blankLineIsParagraph' | 'everyLineIsParagraph';
+    keepEmpty?: boolean;
+    className?: string;
+    doc?: Document;
+  } = {},
+): DocumentFragment {
+  const { mode = 'blankLineIsParagraph', keepEmpty = false, className, doc = document } = opts;
+
+  const frag = doc.createDocumentFragment();
+  if (text == null) return frag;
+
+  // Normalize line endings.
+  const normalized = String(text).replace(/\r\n?/g, '\n');
+
+  // Determine paragraph chunks.
+  const chunks =
+    mode === 'everyLineIsParagraph' ? normalized.split('\n') : normalized.split(/\n{2,}/); // one or more blank lines = new paragraph
+
+  for (const raw of chunks) {
+    const paraText = mode === 'everyLineIsParagraph' ? raw : raw.replace(/\n+$/g, ''); // trim trailing \n inside a paragraph only
+    if (!keepEmpty && /^\s*$/.test(paraText)) continue;
+
+    const p = doc.createElement('p');
+    if (className) p.className = className;
+
+    if (mode === 'everyLineIsParagraph') {
+      // Whole line is a paragraph.
+      p.appendChild(doc.createTextNode(paraText));
+    } else {
+      // Inside a paragraph, single newlines become <br>.
+      const lines = paraText.split('\n');
+      lines.forEach((line, i) => {
+        if (i > 0) p.appendChild(doc.createElement('br'));
+        p.appendChild(doc.createTextNode(line));
+      });
+    }
+
+    frag.appendChild(p);
+  }
+
+  return frag;
 }
