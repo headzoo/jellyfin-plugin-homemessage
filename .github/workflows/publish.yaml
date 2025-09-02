@@ -59,6 +59,7 @@ jobs:
           githubToken: ${{ secrets.GITHUB_TOKEN }}
           pagesBranch: main
           pagesFile: docs/manifest.json
+          repository: headzoo/jellyfin-home-message
 
   publish-on-dispatch:
     if: github.event_name == 'workflow_dispatch'
