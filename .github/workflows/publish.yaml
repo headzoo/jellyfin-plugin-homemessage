@@ -26,6 +26,8 @@ jobs:
       - name: Install deps
         run: |
           pnpm install --frozen-lockfile
+          pnpm build:prod
+          pnpm sass
 
       # --- .NET build/packaging ---
       - name: Setup .NET
@@ -33,13 +35,11 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
-      - name: Build plugin
-        run: |
-          pnpm build
-
       - name: Package with JPRM
         id: jprm
         uses: oddstr13/jellyfin-plugin-repository-manager@v1.1.1
+        with:
+          dotnet-target: net8.0
 
       # Attach the plugin zip (and checksum if present) to the GitHub release
       - name: Upload release assets
