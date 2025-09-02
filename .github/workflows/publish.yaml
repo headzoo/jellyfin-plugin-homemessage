@@ -3,11 +3,15 @@ name: '🚀 Publish Plugin'
 on:
   release:
     types:
-      - released
+      - published
   workflow_dispatch:
 
+permissions:
+  contents: write
+
 jobs:
-  build-release:
+  publish-on-release:
+    if: github.event_name == 'release'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
@@ -47,3 +51,46 @@ jobs:
         with:
           files: |
             ${{ steps.jprm.outputs.artifact }}
+
+  publish-on-dispatch:
+    if: github.event_name == 'workflow_dispatch'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      # --- Web assets: run your build.js first ---
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: "22"
+
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
+
+      - name: Install deps
+        run: |
+          pnpm install --frozen-lockfile
+          pnpm build:prod
+          pnpm sass
+
+      # --- .NET build/packaging ---
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: "8.0.x"
+
+      - name: Package with JPRM
+        id: jprm
+        uses: oddstr13/jellyfin-plugin-repository-manager@v1.1.1
+        with:
+          dotnet-target: net8.0
+
+      # Attach the plugin zip (and checksum if present) to the GitHub release
+      - name: Create release & upload assets
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ github.ref_name }}
+          generate_release_notes: true
+          files: ${{ steps.jprm.outputs.artifact }}
