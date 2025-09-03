@@ -6,11 +6,11 @@
   "scripts": {
     "build": "cd Jellyfin.Plugin.HomeMessage && dotnet publish -c Release -f net8.0",
     "build:web": "npm run build:js && npm run build:sass",
-    "build:js": "node build.js",
-    "build:prod": "node build.js --prod",
+    "build:js": "node scripts/build.js",
+    "build:prod": "node scripts/build.js --prod",
     "build:sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
     "watch:sass": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
-    "watch:js": "node build.js --watch",
+    "watch:js": "node scripts/build.js --watch",
     "watch:typecheck": "tsc -w --noEmit",
     "dev": "concurrently -k \"npm:watch:js\" \"npm:watch:sass\" \"npm:watch:typecheck\"",
     "test:cs": "cd Jellyfin.Plugin.HomeMessage && dotnet test"
