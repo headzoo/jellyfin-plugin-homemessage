@@ -10,17 +10,17 @@
       {
         "changelog": "Test",
         "checksum": "",
-        "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v0.0.0.7/jellyfin-plugin-homemessage_0.0.0.7.zip",
+        "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v0.0.0.8/jellyfin-plugin-homemessage_0.0.0.7.zip",
         "targetAbi": "10.9.0.0",
-        "timestamp": "2025-09-02T20:15:12Z",
+        "timestamp": "2025-09-03T19:30:50Z",
         "version": "0.0.0.7"
       },
       {
-        "changelog": "**Full Changelog**: https://github.com/headzoo/jellyfin-plugin-homemessage/compare/v0.0.0.7...main",
+        "changelog": "Test",
         "checksum": "",
-        "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/main/jellyfin-plugin-homemessage_0.0.0.7.zip",
+        "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v0.0.0.7/jellyfin-plugin-homemessage_0.0.0.7.zip",
         "targetAbi": "10.9.0.0",
-        "timestamp": "2025-09-02T20:18:54Z",
+        "timestamp": "2025-09-02T20:15:12Z",
         "version": "0.0.0.7"
       },
       {
