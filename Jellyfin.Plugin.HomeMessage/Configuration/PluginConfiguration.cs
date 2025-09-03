@@ -39,4 +39,9 @@ public class PluginConfiguration : BasePluginConfiguration
     /// Gets or sets styles that will be injected into the home page.
     /// </summary>
     public string Styles { get; set; }
+
+    /// <summary>
+    /// Gets or sets the expiration time in days.
+    /// </summary>
+    public int Expiration { get; set; }
 }

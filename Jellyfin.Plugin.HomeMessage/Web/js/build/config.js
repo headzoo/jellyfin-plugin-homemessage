@@ -147,6 +147,7 @@
                 "Reset Configuration",
                 () => {
                   setValue(this.configForm.querySelector('textarea[name="styles"]'), styles);
+                  setValue(this.configForm.querySelector('select[name="expiration"]'), "0");
                 }
               );
             };
@@ -198,6 +199,7 @@
               ApiClient.getPluginConfiguration(_HomeMessageConfig.pluginUniqueId).then((config2) => {
                 const values = formValuesAll(this.configForm);
                 config2.Styles = (values.styles || "").toString();
+                config2.Expiration = (values.expiration || 0).toString();
                 ApiClient.updatePluginConfiguration(_HomeMessageConfig.pluginUniqueId, config2).then(
                   (result) => {
                     Dashboard.processPluginConfigurationUpdateResult(result);
@@ -211,6 +213,7 @@
             this.loadConfig = () => {
               ApiClient.getPluginConfiguration(_HomeMessageConfig.pluginUniqueId).then((config2) => {
                 setValue(this.configForm.querySelector('textarea[name="styles"]'), config2.Styles);
+                setValue(this.configForm.querySelector('select[name="expiration"]'), config2.Expiration);
               });
             };
             /**

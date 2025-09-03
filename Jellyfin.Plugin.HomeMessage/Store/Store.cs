@@ -26,6 +26,11 @@ public abstract class Store<T> : IStore<T>
     private readonly string _dbPath;
 
     /// <summary>
+    /// The JSON options.
+    /// </summary>
+    private static readonly JsonSerializerOptions _jsonOptions = new() { WriteIndented = true };
+
+    /// <summary>
     /// Initializes a new instance of the <see cref="Store{T}"/> class.
     /// </summary>
     /// <param name="paths">Instance of the <see cref="IServerApplicationPaths"/> interface.</param>
@@ -63,7 +68,7 @@ public abstract class Store<T> : IStore<T>
     public void Add(T obj)
     {
         _cache.Add(obj);
-        File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
+        File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache, _jsonOptions));
     }
 
     /// <inheritdoc />
