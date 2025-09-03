@@ -24,6 +24,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
+          cache: 'pnpm'   # speeds up installs
 
       - uses: pnpm/action-setup@v4
         with:
@@ -33,6 +34,9 @@ jobs:
       - name: Install deps
         run: |
           pnpm install --frozen-lockfile
+
+      - name: Typecheck
+        run: pnpm exec tsc --noEmit
 
       - name: Build web
         run: |
@@ -44,6 +48,19 @@ jobs:
         with:
           dotnet-version: "8.0.x"
 
+      - name: Cache NuGet
+        uses: actions/cache@v4
+        with:
+          path: ~/.nuget/packages
+          key: ${{ runner.os }}-nuget-${{ hashFiles('**/*.csproj') }}
+          restore-keys: ${{ runner.os }}-nuget-
+
       - name: Build release
         run: |
           dotnet publish Jellyfin.Plugin.HomeMessage/Jellyfin.Plugin.HomeMessage.csproj -c Release -f net8.0 -o release
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: HomeMessage-plugin
+          path: release/**
