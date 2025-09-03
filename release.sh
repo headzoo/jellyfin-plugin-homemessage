@@ -1,69 +1,93 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-if [[ $# -lt 2 ]]; then
-  echo "Usage: $0 {major|minor|build|revision} \"Change log message\"" >&2
-  exit 1
-fi
-
-PART="$1"; shift
-MSG="$*"
+PART="${1:-}"
+MSG="${2-}"   # optional; defaults later
 
 if [[ ! "$PART" =~ ^(major|minor|build|revision)$ ]]; then
-  echo "Error: bump part must be one of: major | minor | build | revision" >&2
+  echo "Usage: $0 {major|minor|build|revision} [\"Change log message\"]" >&2
   exit 1
 fi
 
 PLUGIN_YAML="build.yaml"
 CSPROJ="Jellyfin.Plugin.HomeMessage/Jellyfin.Plugin.HomeMessage.csproj"
 
-[[ -f "$PLUGIN_YAML" ]] || { echo "Error: $PLUGIN_YAML not found." >&2; exit 1; }
+[[ -f "$PLUGIN_YAML" ]] || { echo "Error: $PLUGIN_YAML not found."; exit 1; }
 
-# Extract current 4-part version (handles quoted/unquoted)
-line=$(grep -E '^version:' "$PLUGIN_YAML" | head -1 || true)
-[[ -n "$line" ]] || { echo "Error: 'version:' not found in $PLUGIN_YAML" >&2; exit 1; }
-current=$(sed -E 's/.*version:[[:space:]]*"([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)".*/\1/;t;s/.*version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/' <<<"$line")
-[[ "$current" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Error: bad version format: $current" >&2; exit 1; }
+# --- read current X.Y.Z.W from build.yaml (handles spaces + quotes) ---
+ver_line="$(grep -E '^[[:space:]]*version:' "$PLUGIN_YAML" | head -1 || true)"
+[[ -n "$ver_line" ]] || { echo "Error: 'version:' not found in $PLUGIN_YAML"; exit 1; }
+
+current="$(
+  sed -E '
+    s/.*version:[[:space:]]*"([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)".*/\1/;t;
+    s/.*version:[[:space:]]*([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+).*/\1/;t;
+    s/.*/INVALID/
+  ' <<<"$ver_line"
+)"
+[[ "$current" =~ ^[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+$ ]] || { echo "Bad version format in build.yaml: $current"; exit 1; }
 
 IFS='.' read -r MAJOR MINOR BUILD REVISION <<<"$current"
 
+# --- bump (force base-10 to avoid octal pitfalls like 08/09) ---
 case "$PART" in
-  major)    ((MAJOR++)); MINOR=0; BUILD=0; REVISION=0 ;;
-  minor)    ((MINOR++)); BUILD=0; REVISION=0 ;;
-  build)    ((BUILD++));  REVISION=0 ;;
-  revision) ((REVISION++)) ;;
+  major)
+    MAJOR=$((10#$MAJOR + 1)); MINOR=0; BUILD=0; REVISION=0
+    ;;
+  minor)
+    MINOR=$((10#$MINOR + 1)); BUILD=0; REVISION=0
+    ;;
+  build)
+    BUILD=$((10#$BUILD + 1)); REVISION=0
+    ;;
+  revision)
+    REVISION=$((10#$REVISION + 1))
+    ;;
 esac
 
-newver="$MAJOR.$MINOR.$BUILD.$REVISION"
-echo "Bumping version: $current -> $newver"
+newver="${MAJOR}.${MINOR}.${BUILD}.${REVISION}"
+tag="v${newver}"
+[[ -n "${MSG}" ]] || MSG="Release ${tag}"
+
+echo "Current version: $current"
+echo "Bump: $PART  ->  New version: $newver"
 echo "Changelog: $MSG"
 
-# Update version in build.yaml (quoted or unquoted)
-if grep -qE '^version:\s*"' "$PLUGIN_YAML"; then
-  sed -i -E 's/^version:\s*"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"/version: "'"$newver"'"/' "$PLUGIN_YAML"
+# --- update version in build.yaml (preserve quoting style) ---
+if grep -qE '^[[:space:]]*version:[[:space:]]*"' "$PLUGIN_YAML"; then
+  sed -i -E 's/^([[:space:]]*version:[[:space:]]*)"[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+"/\1"'"$newver"'"/' "$PLUGIN_YAML"
 else
-  sed -i -E 's/^version:\s*([0-9]+\.){3}[0-9]+/version: '"$newver"'/' "$PLUGIN_YAML"
+  sed -i -E 's/^([[:space:]]*version:[[:space:]]*)([0-9]+\.[0-9]+\.[0-9]+\.[0-9]+)/\1'"$newver"'/' "$PLUGIN_YAML"
 fi
 
-# Replace changelog block with the provided message
-# (assumes 'changelog:' is at or near end; safe to delete to EOF and append)
-if grep -qE '^changelog:' "$PLUGIN_YAML"; then
-  sed -i -E '/^changelog:/,$d' "$PLUGIN_YAML"
-fi
-{
-  echo 'changelog: >'
-  # indent each line of $MSG for YAML block scalar
-  while IFS= read -r line; do
-    printf '  %s\n' "$line"
-  done <<< "$MSG"
-} >> "$PLUGIN_YAML"
+# --- replace (or add) changelog block without touching other keys ---
+tmpfile="$(mktemp)"
+awk -v msg="$MSG" '
+  BEGIN { inlog=0; printed=0 }
+  /^[[:space:]]*changelog:/ {
+    # replace from this key until next top-level key
+    print "changelog: >"
+    n = split(msg, lines, /\n/);
+    for (i=1; i<=n; i++) print "  " lines[i];
+    inlog=1; printed=1; next
+  }
+  inlog && /^[A-Za-z0-9_-]+:/ { inlog=0 }   # next top-level key
+  !inlog { print }
+  END {
+    if (!printed) {
+      print "changelog: >"
+      n = split(msg, lines, /\n/);
+      for (i=1; i<=n; i++) print "  " lines[i];
+    }
+  }
+' "$PLUGIN_YAML" > "$tmpfile"
+mv "$tmpfile" "$PLUGIN_YAML"
 
-# Optional: sync <Version> in csproj if present
+# --- sync <Version> in csproj if present ---
 if [[ -f "$CSPROJ" ]]; then
   if grep -qE '<Version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+</Version>' "$CSPROJ"; then
     sed -i -E 's|<Version>[0-9]+\.[0-9]+\.[0-9]+\.[0-9]+</Version>|<Version>'"$newver"'</Version>|' "$CSPROJ"
   else
-    # Insert into first <PropertyGroup> if no Version element exists
     awk -v ver="$newver" '
       BEGIN{done=0}
       /<PropertyGroup>/ && !done { print; print "    <Version>" ver "</Version>"; done=1; next }
@@ -74,24 +98,38 @@ if [[ -f "$CSPROJ" ]]; then
 fi
 
 git add "$PLUGIN_YAML"
+
+# Show the diff we’re about to commit
+echo "----- Diff preview -----"
+git --no-pager diff --cached || true
+echo "------------------------"
+
+if [[ "${DRY_RUN:-0}" == "1" ]]; then
+  echo "[DRY_RUN] Skipping commit & tag"
+  exit 0
+fi
+
 git commit -m "chore(release): v$newver – $MSG"
 
-tag="v$newver"
+# fail early if tag exists
+if git rev-parse "$tag" >/dev/null 2>&1; then
+  echo "Error: tag $tag already exists. Delete it or choose a different bump." >&2
+  exit 1
+fi
+
 git tag -a "$tag" -m "$MSG"
 git push origin HEAD
 git push origin "$tag"
 
-# Create GitHub release with the message as notes
+# --- create GitHub release with notes = MSG ---
 if command -v gh >/dev/null 2>&1; then
   gh release create "$tag" --title "$tag" --notes "$MSG"
 else
-  origin_url=$(git remote get-url origin)
+  origin_url="$(git remote get-url origin)"
   if [[ "$origin_url" =~ github\.com[:/]+([^/]+)/([^/.]+)(\.git)?$ ]]; then
-    owner="${BASH_REMATCH[1]}"
-    repo="${BASH_REMATCH[2]}"
+    owner="${BASH_REMATCH[1]}"; repo="${BASH_REMATCH[2]}"
     token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
-    if [[ -n "${token}" ]]; then
-      # minimal JSON (escape quotes in MSG)
+    if [[ -n "$token" ]]; then
       body=$(printf '%s' "$MSG" | sed 's/"/\\"/g')
       curl -sS -X POST \
         -H "Authorization: Bearer $token" \
