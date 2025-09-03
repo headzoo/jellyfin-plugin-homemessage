@@ -24,15 +24,11 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: "22"
-          cache: 'pnpm'   # speeds up installs
 
-      - name: Enable Corepack
-        run: corepack enable
-
-      - name: Activate PNPM 9
-        run: corepack prepare pnpm@9 --activate
-
-      - run: pnpm -v   # sanity check
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 9
+          run_install: false
 
       - name: Install deps
         run: |
