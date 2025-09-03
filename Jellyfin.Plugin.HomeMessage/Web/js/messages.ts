@@ -9,7 +9,6 @@ import {
 } from './utils';
 
 (async () => {
-  // @ts-ignore
   const { ApiClient, Dashboard } = window;
 
   /**

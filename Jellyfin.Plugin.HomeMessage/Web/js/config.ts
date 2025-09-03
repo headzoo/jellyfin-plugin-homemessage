@@ -2,7 +2,6 @@ import { Config } from './@types/Config';
 import { formValuesAll, setValue } from './utils';
 
 (async () => {
-  // @ts-ignore
   const { ApiClient, Dashboard } = window;
 
   /**

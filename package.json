@@ -5,13 +5,14 @@
   "main": "index.js",
   "scripts": {
     "build": "cd Jellyfin.Plugin.HomeMessage && dotnet publish -c Release -f net8.0",
-    "sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
+    "build:web": "npm run build:js && npm run build:sass",
+    "build:js": "node build.js",
+    "build:prod": "node build.js --prod",
+    "build:sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
+    "watch:js": "node build.js --watch",
     "watch:sass": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
-    "build:js": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts Jellyfin.Plugin.HomeMessage/Web/js/config.ts Jellyfin.Plugin.HomeMessage/Web/js/messages.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap",
-    "build:prod": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts Jellyfin.Plugin.HomeMessage/Web/js/config.ts Jellyfin.Plugin.HomeMessage/Web/js/messages.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --minify --sourcemap",
-    "watch:esbuild": "esbuild Jellyfin.Plugin.HomeMessage/Web/js/boot.ts Jellyfin.Plugin.HomeMessage/Web/js/home.ts Jellyfin.Plugin.HomeMessage/Web/js/config.ts Jellyfin.Plugin.HomeMessage/Web/js/messages.ts --bundle --format=iife --target=es2015 --outdir=Jellyfin.Plugin.HomeMessage/Web/js/build --sourcemap --watch",
-    "dev": "concurrently -k \"npm:watch:*\"",
-    "watch:typecheck": "tsc -w --noEmit"
+    "watch:typecheck": "tsc -w --noEmit",
+    "dev": "concurrently -k \"npm:watch:js\" \"npm:watch:sass\" \"npm:watch:typecheck\""
   },
   "keywords": [],
   "author": "",

@@ -1,7 +1,7 @@
 {
   "compilerOptions": {
-    "target": "ES2015",
-    "lib": ["DOM", "ES2015", "DOM.Iterable"],
+    "target": "ES2018",
+    "lib": ["DOM", "ES2018", "DOM.Iterable"],
     "module": "ESNext",
     "moduleDetection": "legacy",
     "isolatedModules": false,
@@ -9,7 +9,7 @@
     "skipLibCheck": true,
     "strict": false,
     "strictNullChecks": true,
-    "incremental": true,
+    "incremental": false,
     "forceConsistentCasingInFileNames": true,
     "esModuleInterop": true,
     "moduleResolution": "node",
@@ -27,6 +27,8 @@
   "include": [
     "Jellyfin.Plugin.HomeMessage/Web/js/home.ts",
     "Jellyfin.Plugin.HomeMessage/Web/js/boot.ts",
+    "Jellyfin.Plugin.HomeMessage/Web/js/config.ts",
+    "Jellyfin.Plugin.HomeMessage/Web/js/messages.ts",
     "Jellyfin.Plugin.HomeMessage/Web/js/@types/**/*.d.ts"
   ],
   "exclude": ["node_modules"]
