@@ -42,6 +42,16 @@
   <ItemGroup>
     <None Remove="Web\configPage.html" />
     <None Remove="Web\messagesPage.html" />
+    <None Remove="Web\js\build\home.js" />
+    <None Remove="Web\js\build\home.js.map" />
+    <None Remove="Web\js\build\boot.js" />
+    <None Remove="Web\js\build\boot.js.map" />
+    <None Remove="Web\js\build\config.js" />
+    <None Remove="Web\js\build\config.js.map" />
+    <None Remove="Web\js\build\messages.js" />
+    <None Remove="Web\js\build\messages.js.map" />
+    <None Remove="Web\css\build\home.css" />
+    <None Remove="Web\css\build\home.css.map" />
     <EmbeddedResource Include="Web\configPage.html" />
     <EmbeddedResource Include="Web\messagesPage.html" />
     <EmbeddedResource Include="Web\js\build\home.js" />
