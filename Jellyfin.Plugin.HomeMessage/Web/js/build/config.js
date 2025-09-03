@@ -54,7 +54,7 @@
       init_utils();
       (() => __async(null, null, function* () {
         const { ApiClient, Dashboard } = window;
-        const _HomeMessageConfig = class _HomeMessageConfig {
+        const _ConfigController = class _ConfigController {
           /**
            * Initializes a new instance of the HomeMessageConfig class.
            */
@@ -101,11 +101,11 @@
             this.saveConfig = (e) => {
               e.preventDefault();
               Dashboard.showLoadingMsg();
-              ApiClient.getPluginConfiguration(_HomeMessageConfig.pluginUniqueId).then((config2) => {
+              ApiClient.getPluginConfiguration(_ConfigController.pluginUniqueId).then((config) => {
                 const values = formValuesAll(this.configForm);
-                config2.Styles = (values.styles || "").toString();
-                config2.Expiration = (values.expiration || 0).toString();
-                ApiClient.updatePluginConfiguration(_HomeMessageConfig.pluginUniqueId, config2).then(
+                config.Styles = (values.styles || "").toString();
+                config.Expiration = (values.expiration || 0).toString();
+                ApiClient.updatePluginConfiguration(_ConfigController.pluginUniqueId, config).then(
                   (result) => {
                     Dashboard.processPluginConfigurationUpdateResult(result);
                   }
@@ -116,25 +116,25 @@
              * Loads the configuration from the server.
              */
             this.loadConfig = () => {
-              ApiClient.getPluginConfiguration(_HomeMessageConfig.pluginUniqueId).then((config2) => {
-                setValue(this.configForm.querySelector('textarea[name="styles"]'), config2.Styles);
-                setValue(this.configForm.querySelector('select[name="expiration"]'), config2.Expiration);
+              ApiClient.getPluginConfiguration(_ConfigController.pluginUniqueId).then((config) => {
+                setValue(this.configForm.querySelector('textarea[name="styles"]'), config.Styles);
+                setValue(this.configForm.querySelector('select[name="expiration"]'), config.Expiration);
               });
             };
+            const resetBtn = document.getElementById("home-message-reset-btn");
+            resetBtn.addEventListener("click", this.resetConfig);
             this.configForm = document.getElementById("home-message-config-form");
             this.configForm.addEventListener("submit", this.saveConfig);
             this.loadConfig();
-            const resetBtn = document.getElementById("home-message-reset-btn");
-            resetBtn.addEventListener("click", this.resetConfig);
           }
         };
         /**
          * The plugin unique id.
          */
-        _HomeMessageConfig.pluginUniqueId = "69d36d38-5615-4128-b2e0-30caf4c5ba86";
-        let HomeMessageConfig = _HomeMessageConfig;
-        const config = new HomeMessageConfig();
-        config.loadConfig();
+        _ConfigController.pluginUniqueId = "69d36d38-5615-4128-b2e0-30caf4c5ba86";
+        let ConfigController = _ConfigController;
+        const c = new ConfigController();
+        c.loadConfig();
       }))();
     }
   });

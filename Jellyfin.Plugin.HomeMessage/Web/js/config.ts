@@ -5,9 +5,9 @@ import { formValuesAll, setValue } from './utils';
   const { ApiClient, Dashboard } = window;
 
   /**
-   * The configuration page.
+   * Controls the configuration page.
    */
-  class HomeMessageConfig {
+  class ConfigController {
     /**
      * The plugin unique id.
      */
@@ -22,12 +22,12 @@ import { formValuesAll, setValue } from './utils';
      * Initializes a new instance of the HomeMessageConfig class.
      */
     constructor() {
+      const resetBtn = document.getElementById('home-message-reset-btn') as HTMLButtonElement;
+      resetBtn.addEventListener('click', this.resetConfig);
+
       this.configForm = document.getElementById('home-message-config-form') as HTMLFormElement;
       this.configForm.addEventListener('submit', this.saveConfig);
       this.loadConfig();
-
-      const resetBtn = document.getElementById('home-message-reset-btn') as HTMLButtonElement;
-      resetBtn.addEventListener('click', this.resetConfig);
     }
 
     /**
@@ -75,11 +75,12 @@ import { formValuesAll, setValue } from './utils';
       e.preventDefault();
 
       Dashboard.showLoadingMsg();
-      ApiClient.getPluginConfiguration(HomeMessageConfig.pluginUniqueId).then((config: Config) => {
+      ApiClient.getPluginConfiguration(ConfigController.pluginUniqueId).then((config: Config) => {
         const values = formValuesAll(this.configForm);
         config.Styles = (values.styles || '').toString();
         config.Expiration = (values.expiration || 0).toString();
-        ApiClient.updatePluginConfiguration(HomeMessageConfig.pluginUniqueId, config).then(
+
+        ApiClient.updatePluginConfiguration(ConfigController.pluginUniqueId, config).then(
           (result: any) => {
             Dashboard.processPluginConfigurationUpdateResult(result);
           },
@@ -91,13 +92,13 @@ import { formValuesAll, setValue } from './utils';
      * Loads the configuration from the server.
      */
     public loadConfig = () => {
-      ApiClient.getPluginConfiguration(HomeMessageConfig.pluginUniqueId).then((config: Config) => {
+      ApiClient.getPluginConfiguration(ConfigController.pluginUniqueId).then((config: Config) => {
         setValue(this.configForm.querySelector('textarea[name="styles"]'), config.Styles);
         setValue(this.configForm.querySelector('select[name="expiration"]'), config.Expiration);
       });
     };
   }
 
-  const config = new HomeMessageConfig();
-  config.loadConfig();
+  const c = new ConfigController();
+  c.loadConfig();
 })();

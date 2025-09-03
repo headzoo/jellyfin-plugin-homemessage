@@ -11,7 +11,7 @@ declare global {
     Dashboard: {
       alert: (options: any) => void;
       capabilities: (host: string) => any;
-      confirm: (message: string, title: string, callback: () => void) => void;
+      confirm: (message: string, title: string, callback: (result: boolean) => void) => void;
       getPluginUrl: (name: string) => string;
       getConfigurationResourceUrl: (name: string) => string;
       getCurrentUser: () => any;

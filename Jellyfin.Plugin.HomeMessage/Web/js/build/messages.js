@@ -108,7 +108,7 @@
       init_utils();
       (() => __async(null, null, function* () {
         const { ApiClient, Dashboard } = window;
-        class HomeMessageMessages {
+        class MessagesController {
           /**
            * Initializes a new instance of the HomeMessageConfig class.
            */
@@ -128,7 +128,7 @@
               });
             };
             /**
-             * Saves the configuration to the server.
+             * Creates and updates a message.
              *
              * @param e The event.
              */
@@ -198,49 +198,6 @@
               }
             };
             /**
-             * Renders the recent colors.
-             */
-            this.renderRecentColors = () => {
-              const backgroundColors = this.getRecentBackgroundColors();
-              const textColors = this.getRecentTextColors();
-              this.recentBackgroundColorsList.innerHTML = "";
-              if (backgroundColors.length === 0) {
-                this.recentBackgroundColorsList.style.display = "none";
-              } else {
-                this.recentBackgroundColorsList.style.display = "block";
-                for (let i = 0; i < backgroundColors.length; i++) {
-                  const color = backgroundColors[i];
-                  console.log(color);
-                  const li = document.createElement("li");
-                  li.title = "Select color";
-                  li.style.backgroundColor = color;
-                  li.classList.add("home-message-recent-colors-item");
-                  li.addEventListener("click", () => {
-                    setValue(this.form.querySelector('input[name="bgColor"]'), color);
-                  });
-                  this.recentBackgroundColorsList.appendChild(li);
-                }
-              }
-              this.recentTextColorsList.innerHTML = "";
-              if (textColors.length === 0) {
-                this.recentTextColorsList.style.display = "none";
-              } else {
-                this.recentTextColorsList.style.display = "block";
-                for (let i = 0; i < textColors.length; i++) {
-                  const color = textColors[i];
-                  const li = document.createElement("li");
-                  li.title = "Select color";
-                  li.style.backgroundColor = color;
-                  li.classList.add("home-message-recent-colors-item");
-                  li.addEventListener("click", () => {
-                    setValue(this.form.querySelector('input[name="textColor"]'), color);
-                    this.saveRecentTextColor(color);
-                  });
-                  this.recentTextColorsList.appendChild(li);
-                }
-              }
-            };
-            /**
              * Edits a message.
              *
              * @param e The event.
@@ -253,7 +210,7 @@
               if (!messageId) {
                 return;
               }
-              const message = this.messages.find((m2) => m2.Id === messageId);
+              const message = this.messages.find((m) => m.Id === messageId);
               if (!message) {
                 return;
               }
@@ -284,12 +241,18 @@
               if (!messageId) {
                 return;
               }
-              Dashboard.confirm("Are you sure you want to delete this message?", "Delete Message", () => {
-                this.ajax("DELETE", `config/messages/${messageId}`).then(() => {
-                  this.loadMessages();
-                  Dashboard.alert("Message deleted");
-                });
-              });
+              Dashboard.confirm(
+                "Are you sure you want to delete this message?",
+                "Delete Message",
+                (result) => {
+                  if (result) {
+                    this.ajax("DELETE", `config/messages/${messageId}`).then(() => {
+                      this.loadMessages();
+                      Dashboard.alert("Message deleted");
+                    });
+                  }
+                }
+              );
             };
             /**
              * Makes an AJAX request.
@@ -326,6 +289,48 @@
               setChecked(this.form.querySelector('input[name="dismissible"]'), true);
               const submitBtn = document.querySelector("#home-message-submit-btn span");
               submitBtn.textContent = "Add";
+            };
+            /**
+             * Renders the recent colors.
+             */
+            this.renderRecentColors = () => {
+              const backgroundColors = this.getRecentBackgroundColors();
+              const textColors = this.getRecentTextColors();
+              this.recentBackgroundColorsList.innerHTML = "";
+              if (backgroundColors.length === 0) {
+                this.recentBackgroundColorsList.style.display = "none";
+              } else {
+                this.recentBackgroundColorsList.style.display = "block";
+                for (let i = 0; i < backgroundColors.length; i++) {
+                  const color = backgroundColors[i];
+                  const li = document.createElement("li");
+                  li.title = "Select color";
+                  li.style.backgroundColor = color;
+                  li.classList.add("home-message-recent-colors-item");
+                  li.addEventListener("click", () => {
+                    setValue(this.form.querySelector('input[name="bgColor"]'), color);
+                  });
+                  this.recentBackgroundColorsList.appendChild(li);
+                }
+              }
+              this.recentTextColorsList.innerHTML = "";
+              if (textColors.length === 0) {
+                this.recentTextColorsList.style.display = "none";
+              } else {
+                this.recentTextColorsList.style.display = "block";
+                for (let i = 0; i < textColors.length; i++) {
+                  const color = textColors[i];
+                  const li = document.createElement("li");
+                  li.title = "Select color";
+                  li.style.backgroundColor = color;
+                  li.classList.add("home-message-recent-colors-item");
+                  li.addEventListener("click", () => {
+                    setValue(this.form.querySelector('input[name="textColor"]'), color);
+                    this.saveRecentTextColor(color);
+                  });
+                  this.recentTextColorsList.appendChild(li);
+                }
+              }
             };
             /**
              * Adds a color to the list of recently used background colors.
@@ -404,8 +409,8 @@
             this.resetForm();
           }
         }
-        const m = new HomeMessageMessages();
-        m.loadMessages();
+        const c = new MessagesController();
+        c.loadMessages();
       }))();
     }
   });
