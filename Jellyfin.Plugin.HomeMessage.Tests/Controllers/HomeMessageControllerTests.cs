@@ -37,27 +37,33 @@ public class HomeMessageControllerTests
         );
 
         var msg1 = new Message(
-            Id: "id1",
             Title: "Hello",
             Text: "World",
             Dismissible: true,
             BgColor: "#000",
             TextColor: "#fff",
             TimeStart: null,
-            TimeEnd: null,
-            CreatedTime: 0
-        );
+            TimeEnd: null
+        )
+        {
+            Id = "id1",
+            CreatedTime = 0,
+        };
+
         var msg2 = new Message(
-            Id: "id2",
             Title: "Bye",
             Text: "World",
             Dismissible: true,
             BgColor: "#000",
             TextColor: "#fff",
             TimeStart: null,
-            TimeEnd: null,
-            CreatedTime: 0
-        );
+            TimeEnd: null
+        )
+        {
+            Id = "id2",
+            CreatedTime = 0,
+        };
+
         var messages = new[] { msg1, msg2 };
         messageStore.Setup(s => s.GetAll()).Returns(messages);
 
@@ -130,19 +136,23 @@ public class HomeMessageControllerTests
         );
 
         var msg1 = new Message(
-            Id: "id1",
             Title: "Hello",
             Text: "World",
             Dismissible: true,
             BgColor: "#000",
             TextColor: "#fff",
             TimeStart: null,
-            TimeEnd: null,
-            CreatedTime: 0
-        );
+            TimeEnd: null
+        )
+        {
+            Id = "id1",
+            CreatedTime = 0,
+        };
 
         messageStore.Setup(s => s.GetById("id1")).Returns(msg1);
-        messageStore.Setup(s => s.Update(It.Is<Message>(m => m.Title == "Goodbye")));
+        messageStore.Setup(s =>
+            s.Update(It.Is<string>(m => m == "id1"), It.Is<Message>(m => m.Title == "Goodbye"))
+        );
 
         // Act
         var inputMessage = new MessageInput(
@@ -157,21 +167,23 @@ public class HomeMessageControllerTests
         var result = controller.UpdateMessage(inputMessage, "id1");
 
         var msg2 = new Message(
-            Id: "id1",
             Title: "Goodbye",
             Text: "World",
             Dismissible: true,
             BgColor: "#000",
             TextColor: "#fff",
             TimeStart: null,
-            TimeEnd: null,
-            CreatedTime: 0
-        );
+            TimeEnd: null
+        )
+        {
+            Id = "id1",
+            CreatedTime = 0,
+        };
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
         var ok = (OkObjectResult)result;
-        ok.Value.Should().BeAssignableTo<Message>().Which.Should().BeEquivalentTo(msg2); // verify interaction
+        ok.Value.Should().BeAssignableTo<Message>().Which.Should().BeEquivalentTo(msg2);
     }
 
     /// <summary>
@@ -193,16 +205,18 @@ public class HomeMessageControllerTests
         );
 
         var msg1 = new Message(
-            Id: "id1",
             Title: "Hello",
             Text: "World",
             Dismissible: true,
             BgColor: "#000",
             TextColor: "#fff",
             TimeStart: null,
-            TimeEnd: null,
-            CreatedTime: 0
-        );
+            TimeEnd: null
+        )
+        {
+            Id = "id1",
+            CreatedTime = 0,
+        };
 
         messageStore.Setup(s => s.GetById("id1")).Returns(msg1);
         messageStore.Setup(s => s.Remove("id1"));
@@ -234,16 +248,18 @@ public class HomeMessageControllerTests
         );
 
         var msg1 = new Message(
-            Id: "id1",
             Title: "Hello",
             Text: "World",
             Dismissible: true,
             BgColor: "#000",
             TextColor: "#fff",
             TimeStart: null,
-            TimeEnd: null,
-            CreatedTime: 0
-        );
+            TimeEnd: null
+        )
+        {
+            Id = "id1",
+            CreatedTime = 0,
+        };
 
         messageStore.Setup(s => s.GetById("id1")).Returns(msg1);
         dismissedStore.Setup(s => s.Add(It.Is<Dismissed>(d => d.MessageId == "id1")));
@@ -259,7 +275,6 @@ public class HomeMessageControllerTests
     /// <summary>
     /// Gets the mock auth.
     /// </summary>
-    /// <returns></returns>
     private Mock<IAuthorizationContext> GetMockAuth()
     {
         var auth = new Mock<IAuthorizationContext>(MockBehavior.Strict);

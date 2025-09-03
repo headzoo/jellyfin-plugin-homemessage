@@ -30,8 +30,7 @@ jobs:
       - name: Install deps
         run: |
           pnpm install --frozen-lockfile
-          pnpm build:prod
-          pnpm sass
+          pnpm build:web
 
       # --- .NET build/packaging ---
       - name: Setup .NET
@@ -81,8 +80,7 @@ jobs:
       - name: Install deps
         run: |
           pnpm install --frozen-lockfile
-          pnpm build:prod
-          pnpm sass
+          pnpm build:web
 
       # --- .NET build/packaging ---
       - name: Setup .NET
