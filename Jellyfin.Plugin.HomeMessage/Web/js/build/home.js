@@ -102,45 +102,40 @@
         const cssClassPrefix = "home-message";
         const pluginUniqueId = "69d36d38-5615-4128-b2e0-30caf4c5ba86";
         const displayMessage = (messageElements, message) => {
-          const messageItem = createElement("li");
-          messageElements.appendChild(messageItem);
-          const messageBody = createElement("div", {
-            class: `${cssClassPrefix}-body`,
-            style: `background-color: ${message.BgColor}; color: ${message.TextColor};`
+          const createdDate = new Date(message.CreatedTime * 1e3);
+          const messageItem = createElement("li", {
+            html: `
+        <div
+            class="home-message-body"
+            style="background-color: ${message.BgColor}; color: ${message.TextColor};"
+        >
+          ${message.Dismissible ? `<button title="Close" class="home-message-dismiss">&times;</button>` : ""}
+          <div class="home-message-title">
+            ${message.Title}
+          </div>
+          <time class="home-message-time">
+            ${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}
+          </time>
+          <div class="home-message-text"></div>
+        </div>
+        `
           });
-          messageItem.appendChild(messageBody);
+          const text = messageItem.querySelector(".home-message-text");
+          if (text) {
+            text.appendChild(paragraphsFromText(message.Text));
+          }
           if (message.Dismissible) {
-            const btn = createElement("button", {
-              title: "Close",
-              class: `${cssClassPrefix}-dismiss`,
-              html: "&times;"
-            });
+            const btn = messageItem.querySelector(".home-message-dismiss");
             btn.addEventListener("click", () => __async(null, null, function* () {
-              messageElements.removeChild(messageBody);
+              messageElements.removeChild(messageItem);
               const url = ApiClient.getUrl(`HomeMessage/messages/${message.Id}`);
               yield ApiClient.ajax({
                 type: "DELETE",
                 url
               });
             }));
-            messageBody.appendChild(btn);
           }
-          const titleElement = createElement("h3", {
-            class: `${cssClassPrefix}-title`,
-            html: message.Title
-          });
-          messageBody.appendChild(titleElement);
-          const createdDate = new Date(message.CreatedTime * 1e3);
-          const timeElement = createElement("time", {
-            class: `${cssClassPrefix}-time`,
-            html: `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`
-          });
-          messageBody.appendChild(timeElement);
-          const textElement = createElement("div", {
-            class: `${cssClassPrefix}-text`,
-            html: paragraphsFromText(message.Text)
-          });
-          messageBody.appendChild(textElement);
+          messageElements.appendChild(messageItem);
         };
         const ready = (indexPage) => __async(null, null, function* () {
           ApiClient.getPluginConfiguration(pluginUniqueId).then((config) => __async(null, null, function* () {

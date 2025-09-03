@@ -12,6 +12,8 @@ public class PluginConfiguration : BasePluginConfiguration
     /// </summary>
     public PluginConfiguration()
     {
+        Expiration = 365;
+
         Styles = """
 /* Wraps each message. */
 .home-message-body {
