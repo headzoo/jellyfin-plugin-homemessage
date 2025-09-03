@@ -5,18 +5,18 @@ using Microsoft.Extensions.Hosting;
 namespace Jellyfin.Plugin.HomeMessage.Html;
 
 /// <summary>
-/// Service that handles Jellyfin startup and shutdown.
+/// Service that injects the Home Message HTML into the home page at startup and removes it at shutdown.
 /// </summary>
 /// <remarks>
-/// Initializes a new instance of the <see cref="ShutdownAwareService"/> class.
+/// Initializes a new instance of the <see cref="InjectionAwareService"/> class.
 /// </remarks>
-/// <param name="htmlInjector">Instance of the <see cref="HtmlInjector"/> class.</param>
-public sealed class ShutdownAwareService(HtmlInjector htmlInjector) : IHostedService
+/// <param name="htmlInjector">Instance of the <see cref="IHtmlInjector"/> class.</param>
+public sealed class InjectionAwareService(IHtmlInjector htmlInjector) : IHostedService
 {
     /// <summary>
     /// The HTML injector.
     /// </summary>
-    private readonly HtmlInjector _htmlInjector = htmlInjector;
+    private readonly IHtmlInjector _htmlInjector = htmlInjector;
 
     /// <summary>
     /// Injects the Home Message HTML into the home page.

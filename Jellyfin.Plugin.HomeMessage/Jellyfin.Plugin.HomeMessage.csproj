@@ -39,8 +39,8 @@
     />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Configuration\configPage.html" />
-    <EmbeddedResource Include="Configuration\configPage.html" />
+    <None Remove="Web\configPage.html" />
+    <EmbeddedResource Include="Web\configPage.html" />
     <EmbeddedResource Include="Web\js\build\home.js" />
     <EmbeddedResource Include="Web\js\build\home.js.map" />
     <EmbeddedResource Include="Web\js\build\boot.js" />

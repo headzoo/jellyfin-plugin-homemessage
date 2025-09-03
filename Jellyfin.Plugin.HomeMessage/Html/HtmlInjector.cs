@@ -14,6 +14,7 @@ namespace Jellyfin.Plugin.HomeMessage.Html;
 /// <param name="applicationPaths">Instance of the <see cref="IApplicationPaths"/> interface.</param>
 /// <param name="logger">Instance of the <see cref="ILogger"/> interface.</param>
 public class HtmlInjector(IApplicationPaths applicationPaths, ILogger<HtmlInjector> logger)
+    : IHtmlInjector
 {
     /// <summary>
     /// Instance of the <see cref="IApplicationPaths"/> interface.
@@ -25,9 +26,7 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger<HtmlInject
     /// </summary>
     private readonly ILogger _logger = logger;
 
-    /// <summary>
-    /// Injects the HTML into the home page.
-    /// </summary>
+    /// <inheritdoc />
     public async void Inject()
     {
         var indexFile = GetIndexFilePath();
@@ -50,9 +49,7 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger<HtmlInject
         _logger.LogInformation("Injected scripts and styles into {File}.", indexFile);
     }
 
-    /// <summary>
-    /// Removes the HTML that was injected into the home page.
-    /// </summary>
+    /// <inheritdoc />
     public async void Cleanup()
     {
         var indexFile = GetIndexFilePath();

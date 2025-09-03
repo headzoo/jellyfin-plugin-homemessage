@@ -23,7 +23,7 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
     {
         serviceCollection.AddSingleton<IMessageStore, MessageStore>();
         serviceCollection.AddSingleton<IDismissedStore, DismissedStore>();
-        serviceCollection.AddSingleton<HtmlInjector>();
-        serviceCollection.AddHostedService<ShutdownAwareService>();
+        serviceCollection.AddSingleton<IHtmlInjector, HtmlInjector>();
+        serviceCollection.AddHostedService<InjectionAwareService>();
     }
 }

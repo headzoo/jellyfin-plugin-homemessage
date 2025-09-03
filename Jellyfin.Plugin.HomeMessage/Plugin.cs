@@ -77,7 +77,7 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
             new PluginPageInfo
             {
                 Name = Name,
-                EmbeddedResourcePath = $"{prefix}.Configuration.configPage.html",
+                EmbeddedResourcePath = $"{prefix}.Web.configPage.html",
             },
         ];
     }
