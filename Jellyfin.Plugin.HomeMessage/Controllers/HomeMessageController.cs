@@ -53,11 +53,6 @@ public class HomeMessageController(
     private readonly IDismissedStore _dismissedStore = dismissedStore;
 
     /// <summary>
-    ///  Gets the message store.
-    /// </summary>
-    public IMessageStore MessageStore => _messageStore;
-
-    /// <summary>
     /// Require a logged-in session (the home screen is behind auth anyway).
     /// </summary>
     /// <returns>The response.</returns>
