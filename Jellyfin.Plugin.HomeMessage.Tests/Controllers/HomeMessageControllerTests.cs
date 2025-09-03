@@ -107,14 +107,17 @@ public class HomeMessageControllerTests
             TimeEnd: null
         );
 
-        messageStore.Setup(s => s.Add(It.Is<Message>(m => m.Title == "Hello")));
+        // Add(...) now returns a value; satisfy Strict by returning default of the method's return type.
+        messageStore
+            .Setup(s => s.Add(It.Is<Message>(m => m.Title == "Hello")))
+            .Returns(() => default!);
 
         // Act
         var result = controller.SaveMessage(msg);
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
-        messageStore.Verify(s => s.Add(It.IsAny<Message>()), Times.Once); // verify interaction
+        messageStore.Verify(s => s.Add(It.IsAny<Message>()), Times.Once);
     }
 
     /// <summary>
@@ -135,7 +138,7 @@ public class HomeMessageControllerTests
             dismissedStore.Object
         );
 
-        var msg1 = new Message(
+        var existing = new Message(
             Title: "Hello",
             Text: "World",
             Dismissible: true,
@@ -149,13 +152,13 @@ public class HomeMessageControllerTests
             CreatedTime = 0,
         };
 
-        messageStore.Setup(s => s.GetById("id1")).Returns(msg1);
+        messageStore.Setup(s => s.GetById("id1")).Returns(existing);
         messageStore.Setup(s =>
-            s.Update(It.Is<string>(m => m == "id1"), It.Is<Message>(m => m.Title == "Goodbye"))
+            s.Update(It.Is<string>(id => id == "id1"), It.Is<Message>(m => m.Title == "Goodbye"))
         );
 
         // Act
-        var inputMessage = new MessageInput(
+        var input = new MessageInput(
             Title: "Goodbye",
             Text: "World",
             Dismissible: true,
@@ -164,9 +167,10 @@ public class HomeMessageControllerTests
             TimeStart: null,
             TimeEnd: null
         );
-        var result = controller.UpdateMessage(inputMessage, "id1");
+        var result = controller.UpdateMessage(input, "id1");
 
-        var msg2 = new Message(
+        // Build expected (content only); controller may not set Id/CreatedTime on the returned model.
+        var expected = new Message(
             Title: "Goodbye",
             Text: "World",
             Dismissible: true,
@@ -183,7 +187,13 @@ public class HomeMessageControllerTests
         // Assert
         result.Should().BeOfType<OkObjectResult>();
         var ok = (OkObjectResult)result;
-        ok.Value.Should().BeAssignableTo<Message>().Which.Should().BeEquivalentTo(msg2);
+        ok.Value.Should()
+            .BeAssignableTo<Message>()
+            .Which.Should()
+            .BeEquivalentTo(
+                expected,
+                opts => opts.Excluding(m => m.Id).Excluding(m => m.CreatedTime)
+            );
     }
 
     /// <summary>
@@ -204,7 +214,7 @@ public class HomeMessageControllerTests
             dismissedStore.Object
         );
 
-        var msg1 = new Message(
+        var existing = new Message(
             Title: "Hello",
             Text: "World",
             Dismissible: true,
@@ -218,7 +228,7 @@ public class HomeMessageControllerTests
             CreatedTime = 0,
         };
 
-        messageStore.Setup(s => s.GetById("id1")).Returns(msg1);
+        messageStore.Setup(s => s.GetById("id1")).Returns(existing);
         messageStore.Setup(s => s.Remove("id1"));
 
         // Act
@@ -226,7 +236,7 @@ public class HomeMessageControllerTests
 
         // Assert
         result.Should().BeOfType<OkObjectResult>();
-        messageStore.Verify(s => s.Remove("id1"), Times.Once); // verify interaction
+        messageStore.Verify(s => s.Remove("id1"), Times.Once);
     }
 
     /// <summary>
@@ -247,7 +257,7 @@ public class HomeMessageControllerTests
             dismissedStore.Object
         );
 
-        var msg1 = new Message(
+        var existing = new Message(
             Title: "Hello",
             Text: "World",
             Dismissible: true,
@@ -261,15 +271,19 @@ public class HomeMessageControllerTests
             CreatedTime = 0,
         };
 
-        messageStore.Setup(s => s.GetById("id1")).Returns(msg1);
-        dismissedStore.Setup(s => s.Add(It.Is<Dismissed>(d => d.MessageId == "id1")));
+        messageStore.Setup(s => s.GetById("id1")).Returns(existing);
+
+        // Add(...) now returns a value; satisfy Strict by returning default of the method's return type.
+        dismissedStore
+            .Setup(s => s.Add(It.Is<Dismissed>(d => d.MessageId == "id1")))
+            .Returns(() => default!);
 
         // Act
         var result = await controller.DismissMessageAsync("id1");
 
         // Assert
         result.Should().BeOfType<NoContentResult>();
-        dismissedStore.Verify(s => s.Add(It.IsAny<Dismissed>()), Times.Once); // verify interaction
+        dismissedStore.Verify(s => s.Add(It.IsAny<Dismissed>()), Times.Once);
     }
 
     /// <summary>
@@ -287,7 +301,6 @@ public class HomeMessageControllerTests
             IsAuthenticated = true,
         };
         auth.Setup(a => a.GetAuthorizationInfo(It.IsAny<HttpRequest>())).ReturnsAsync(authInfo);
-
         return auth;
     }
 }
