@@ -3,7 +3,7 @@ const esbuild = require('esbuild');
 const path = require('node:path');
 const fs = require('node:fs');
 
-const JS_DIR = path.resolve('../Jellyfin.Plugin.HomeMessage/Web/js');
+const JS_DIR = path.resolve('Jellyfin.Plugin.HomeMessage/Web/js');
 const OUT_DIR = path.join(JS_DIR, 'build');
 
 const entryPoints = ['boot.ts', 'home.ts', 'config.ts', 'messages.ts'].map((f) =>
