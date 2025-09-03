@@ -33,7 +33,7 @@ jobs:
       - name: Test
         run: |
           dotnet test Jellyfin.Plugin.HomeMessage.Tests/Jellyfin.Plugin.HomeMessage.Tests.csproj \
-            -c Release --no-build \
+            -c Release \
             --logger "console;verbosity=normal;summary=true" \
             --logger "trx;LogFileName=TestResults.trx"
 
