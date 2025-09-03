@@ -21,8 +21,8 @@ public sealed class PluginServiceRegistrator : IPluginServiceRegistrator
         IServerApplicationHost applicationHost
     )
     {
-        serviceCollection.AddSingleton<MessageStore>();
-        serviceCollection.AddSingleton<DismissedStore>();
+        serviceCollection.AddSingleton<IMessageStore, MessageStore>();
+        serviceCollection.AddSingleton<IDismissedStore, DismissedStore>();
         serviceCollection.AddSingleton<HtmlInjector>();
         serviceCollection.AddHostedService<ShutdownAwareService>();
     }

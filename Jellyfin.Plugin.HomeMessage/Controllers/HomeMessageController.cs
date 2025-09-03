@@ -28,8 +28,8 @@ namespace Jellyfin.Plugin.HomeMessage.Controllers;
 public class HomeMessageController(
     IAuthorizationContext auth,
     ILogger<HomeMessageController> logger,
-    MessageStore messageStore,
-    DismissedStore dismissedStore
+    IMessageStore messageStore,
+    IDismissedStore dismissedStore
 ) : ControllerBase
 {
     /// <summary>
@@ -45,12 +45,17 @@ public class HomeMessageController(
     /// <summary>
     /// Gets the message store.
     /// </summary>
-    private readonly MessageStore _messageStore = messageStore;
+    private readonly IMessageStore _messageStore = messageStore;
 
     /// <summary>
     /// Gets the dismissed store.
     /// </summary>
-    private readonly DismissedStore _dismissedStore = dismissedStore;
+    private readonly IDismissedStore _dismissedStore = dismissedStore;
+
+    /// <summary>
+    ///  Gets the message store.
+    /// </summary>
+    public IMessageStore MessageStore => _messageStore;
 
     /// <summary>
     /// Require a logged-in session (the home screen is behind auth anyway).
@@ -109,7 +114,7 @@ public class HomeMessageController(
             return BadRequest();
         }
 
-        var message = _messageStore.Get(id);
+        var message = _messageStore.GetById(id);
         if (message is null)
         {
             return NotFound();

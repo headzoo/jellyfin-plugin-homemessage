@@ -12,7 +12,7 @@ namespace Jellyfin.Plugin.HomeMessage.Store;
 /// Base class for stores.
 /// </summary>
 /// <typeparam name="T">The type of the object to store.</typeparam>
-public abstract class Store<T>
+public abstract class Store<T> : IStore<T>
     where T : IHasId
 {
     /// <summary>
@@ -47,39 +47,26 @@ public abstract class Store<T>
     /// </summary>
     protected IReadOnlyList<T> Cache => _cache;
 
-    /// <summary>
-    /// Gets the message with the given ID.
-    /// </summary>
-    /// <param name="id">The ID of the message.</param>
-    /// <returns>The message.</returns>
-    public T? Get(string id)
+    /// <inheritdoc />
+    public T? GetById(string id)
     {
         return _cache.FirstOrDefault(m => m.Id == id);
     }
 
-    /// <summary>
-    /// Gets all dismissed state from the database.
-    /// </summary>
-    /// <returns>The dismissed state.</returns>
+    /// <inheritdoc />
     public T[] GetAll()
     {
         return [.. _cache];
     }
 
-    /// <summary>
-    /// Adds the given object to the cache and writes it to the database.
-    /// </summary>
-    /// <param name="obj">The object to add.</param>
+    /// <inheritdoc />
     public void Add(T obj)
     {
         _cache.Add(obj);
         File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
     }
 
-    /// <summary>
-    /// Updates the given object in the cache and writes it to the database.
-    /// </summary>
-    /// <param name="obj">The object to update.</param>
+    /// <inheritdoc />
     public void Update(T obj)
     {
         var existing =
@@ -90,15 +77,12 @@ public abstract class Store<T>
         File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
     }
 
-    /// <summary>
-    /// Removes the given object from the cache and writes it to the database.
-    /// </summary>
-    /// <param name="id">The ID of the object to remove.</param>
+    /// <inheritdoc />
     public void Remove(string id)
     {
         var removed = _cache.RemoveAll(m => m.Id == id);
         Plugin.Instance?.Logger.Log(
-            Microsoft.Extensions.Logging.LogLevel.Information,
+            LogLevel.Information,
             "Removed {Count} message(s) from cache",
             removed
         );

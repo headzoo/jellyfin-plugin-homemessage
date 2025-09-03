@@ -9,13 +9,11 @@ namespace Jellyfin.Plugin.HomeMessage.Store;
 /// Stores messages in a JSON file.
 /// </summary>
 /// <param name="paths">Instance of the <see cref="IServerApplicationPaths"/> interface.</param>
-public class MessageStore(IServerApplicationPaths paths) : Store<Message>(paths, "messages.json")
+public class MessageStore(IServerApplicationPaths paths)
+    : Store<Message>(paths, "messages.json"),
+        IMessageStore
 {
-    /// <summary>
-    /// Gets all messages that have not been dismissed.
-    /// </summary>
-    /// <param name="dismissed">The dismissed state.</param>
-    /// <returns>The messages.</returns>
+    /// <inheritdoc />
     public Message[] GetNotDismissed(Dismissed[] dismissed)
     {
         var ids = dismissed.Select(d => d.MessageId).ToArray();

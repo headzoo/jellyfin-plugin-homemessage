@@ -9,13 +9,10 @@ namespace Jellyfin.Plugin.HomeMessage.Store;
 /// </summary>
 /// <param name="paths">Instance of the <see cref="IServerApplicationPaths"/> interface.</param>
 public class DismissedStore(IServerApplicationPaths paths)
-    : Store<Dismissed>(paths, "dismissed.json")
+    : Store<Dismissed>(paths, "dismissed.json"),
+        IDismissedStore
 {
-    /// <summary>
-    /// Gets all dismissed state from the database for a given user.
-    /// </summary>
-    /// <param name="userId">The ID of the user.</param>
-    /// <returns>The dismissed state.</returns>
+    /// <inheritdoc />
     public Dismissed[] GetByUserId(string userId)
     {
         return [.. Cache.Where(d => d.UserId == userId)];
