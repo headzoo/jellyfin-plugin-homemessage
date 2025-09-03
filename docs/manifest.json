@@ -8,6 +8,14 @@
     "owner": "headzoo",
     "versions": [
       {
+        "changelog": "Testing",
+        "checksum": "",
+        "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v1.0.1.0/jellyfin-plugin-homemessage_1.0.1.0.zip",
+        "targetAbi": "10.9.0.0",
+        "timestamp": "2025-09-03T22:13:36Z",
+        "version": "1.0.1.0"
+      },
+      {
         "changelog": "First release",
         "checksum": "",
         "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v1.0.0.0/jellyfin-plugin-homemessage_1.0.0.0.zip",
