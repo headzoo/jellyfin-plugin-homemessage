@@ -46,4 +46,4 @@ jobs:
 
       - name: Build release
         run: |
-          dotnet publish -c Release -f net8.0 -o release
+          dotnet publish Jellyfin.Plugin.HomeMessage/Jellyfin.Plugin.HomeMessage.csproj -c Release -f net8.0 -o release
