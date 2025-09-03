@@ -9,8 +9,8 @@
     "build:js": "node build.js",
     "build:prod": "node build.js --prod",
     "build:sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
-    "watch:js": "node build.js --watch",
     "watch:sass": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
+    "watch:js": "node build.js --watch",
     "watch:typecheck": "tsc -w --noEmit",
     "dev": "concurrently -k \"npm:watch:js\" \"npm:watch:sass\" \"npm:watch:typecheck\"",
     "test:cs": "cd Jellyfin.Plugin.HomeMessage && dotnet test"
