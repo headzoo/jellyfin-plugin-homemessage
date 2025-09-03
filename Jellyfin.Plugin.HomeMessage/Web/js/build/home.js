@@ -100,11 +100,15 @@
       (() => __async(null, null, function* () {
         const { ApiClient } = window;
         const cssClassPrefix = "home-message";
+        const pluginUniqueId = "69d36d38-5615-4128-b2e0-30caf4c5ba86";
         const displayMessage = (messageElements, message) => {
-          const messageElement = createElement("div", {
-            class: `${cssClassPrefix}-message`,
+          const messageItem = createElement("li");
+          messageElements.appendChild(messageItem);
+          const messageBody = createElement("div", {
+            class: `${cssClassPrefix}-body`,
             style: `background-color: ${message.BgColor}; color: ${message.TextColor};`
           });
+          messageItem.appendChild(messageBody);
           if (message.Dismissible) {
             const btn = createElement("button", {
               title: "Close",
@@ -112,44 +116,57 @@
               html: "&times;"
             });
             btn.addEventListener("click", () => __async(null, null, function* () {
-              messageElements.removeChild(messageElement);
+              messageElements.removeChild(messageBody);
               const url = ApiClient.getUrl(`HomeMessage/messages/${message.Id}`);
               yield ApiClient.ajax({
                 type: "DELETE",
                 url
               });
             }));
-            messageElement.appendChild(btn);
+            messageBody.appendChild(btn);
           }
           const titleElement = createElement("h3", {
             class: `${cssClassPrefix}-title`,
             html: message.Title
           });
-          messageElement.appendChild(titleElement);
+          messageBody.appendChild(titleElement);
           const createdDate = new Date(message.CreatedTime * 1e3);
           const timeElement = createElement("time", {
             class: `${cssClassPrefix}-time`,
             html: `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`
           });
-          messageElement.appendChild(timeElement);
-          const textElement = createElement("p", {
+          messageBody.appendChild(timeElement);
+          const textElement = createElement("div", {
             class: `${cssClassPrefix}-text`,
             html: paragraphsFromText(message.Text)
           });
-          messageElement.appendChild(textElement);
-          messageElements.appendChild(messageElement);
+          messageBody.appendChild(textElement);
         };
         const ready = (indexPage) => __async(null, null, function* () {
-          const messageElements = createElement("div", {
-            class: `${cssClassPrefix}-messages emby-scroller`
+          ApiClient.getPluginConfiguration(pluginUniqueId).then((config) => __async(null, null, function* () {
+            const styles = config.Styles || "";
+            if (styles) {
+              const style = document.createElement("style");
+              style.innerHTML = styles;
+              document.head.appendChild(style);
+            }
+            const container = createElement("div", {
+              class: `emby-scroller`
+            });
+            indexPage.prepend(container);
+            const messageElements = createElement("ul", {
+              class: `${cssClassPrefix}-messages`
+            });
+            container.prepend(messageElements);
+            const url = ApiClient.getUrl("HomeMessage/messages");
+            const messages = yield ApiClient.getJSON(url);
+            for (let i = 0; i < messages.length; i++) {
+              const message = messages[i];
+              displayMessage(messageElements, message);
+            }
+          })).catch((error) => {
+            console.error(error);
           });
-          indexPage.prepend(messageElements);
-          const url = ApiClient.getUrl("HomeMessage/messages");
-          const messages = yield ApiClient.getJSON(url);
-          for (let i = 0; i < messages.length; i++) {
-            const message = messages[i];
-            displayMessage(messageElements, message);
-          }
         });
         const boot = () => __async(null, null, function* () {
           const indexPage = document.getElementById("indexPage");

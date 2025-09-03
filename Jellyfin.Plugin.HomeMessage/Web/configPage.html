@@ -33,6 +33,12 @@
                 }
             }
 
+            .home-message-form-help {
+                display: block;
+                margin-top: 0.5rem;
+                font-size: 0.8em;
+            }
+
             .home-message-config-messages-item-body {
                 padding: 1em;
                 border-radius: 0.5em;
@@ -94,11 +100,35 @@
                 cursor: pointer;
             }
         </style>
+
         <div data-role="content">
             <div class="content-primary">
                 <h2>Home Messages</h2>
 
                 <form id="home-message-config-form" class="configForm">
+                    <h3>Configuration</h3>
+                    <div class="inputContainer">
+                        <label class="inputLabel inputLabelUnfocused" for="input-styles">Styles</label>
+                        <textarea name="styles" is="emby-textarea" class="emby-input emby-textarea" id="input-styles"
+                            rows="5"></textarea>
+                        <small class="home-message-form-help">
+                            Additional CSS styles to inject into the home page.
+                        </small>
+                    </div>
+
+                    <div>
+                        <button is="emby-button" type="submit" class="raised
+                        button-submit block emby-button" style="margin-bottom: 1rem;">
+                            <span>Save</span>
+                        </button>
+                        <button id="home-message-reset-btn" is="emby-button" type="button"
+                            class="raised block emby-button">
+                            <span>Reset</span>
+                        </button>
+                    </div>
+                </form>
+
+                <form id="home-message-message-form" class="configForm">
                     <h3>Add Message</h3>
                     <input type="hidden" name="id" value="" />
 
@@ -166,13 +196,13 @@
 
                 <template id="home-message-item-template">
                     <li>
-                        <div class="home-message-config-messages-item-body">
-                            <div class="home-message-config-messages-item-heading" data-message-id="${message.Id}">
+                        <div class="home-message-config-messages-item-body home-message-body">
+                            <div class="home-message-config-messages-item-heading" data-message-id="">
                                 <div>
-                                    <h4 class="home-message-config-messages-item-heading-title">${message.Title}</h4>
-                                    <time
-                                        class="home-message-config-messages-item-heading-time">${createdDate.toLocaleDateString()}
-                                        ${createdDate.toLocaleTimeString()}</time>
+                                    <h4 class="home-message-config-messages-item-heading-title
+                                    home-message-title"></h4>
+                                    <time class="home-message-config-messages-item-heading-time
+                                    home-message-time"></time>
                                 </div>
                                 <div>
                                     <button title="Edit Message"
@@ -183,7 +213,7 @@
                                 </div>
                             </div>
 
-                            <p>${message.Text}</p>
+                            <div class="home-message-config-messages-item-text home-message-text"></div>
                         </div>
                     </li>
                 </template>

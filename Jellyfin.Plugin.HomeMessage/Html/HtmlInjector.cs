@@ -49,7 +49,9 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger<HtmlInject
         _logger.LogInformation("Injected scripts and styles into {File}.", indexFile);
     }
 
-    /// <inheritdoc />
+    /// <summary>
+    /// Removes the HTML that was injected into the home page.
+    /// </summary>
     public async void Cleanup()
     {
         var indexFile = GetIndexFilePath();
@@ -127,8 +129,8 @@ public class HtmlInjector(IApplicationPaths applicationPaths, ILogger<HtmlInject
         style.Id = "home-message-styles";
         style.SetAttribute("type", "text/css");
         style.InnerHtml = r.ReadToEnd();
-
         body.AppendChild(style);
+
         _logger.LogInformation("Injected styles");
     }
 

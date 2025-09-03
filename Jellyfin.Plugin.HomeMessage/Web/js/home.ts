@@ -4,6 +4,7 @@ import { createElement, paragraphsFromText } from './utils';
 (async () => {
   const { ApiClient } = window;
   const cssClassPrefix = 'home-message';
+  const pluginUniqueId = '69d36d38-5615-4128-b2e0-30caf4c5ba86';
 
   /**
    * Displays a message on the home page.
@@ -12,10 +13,14 @@ import { createElement, paragraphsFromText } from './utils';
    * @param message The message to display.
    */
   const displayMessage = (messageElements: HTMLElement, message: Message) => {
-    const messageElement = createElement('div', {
-      class: `${cssClassPrefix}-message`,
+    const messageItem = createElement('li');
+    messageElements.appendChild(messageItem);
+
+    const messageBody = createElement('div', {
+      class: `${cssClassPrefix}-body`,
       style: `background-color: ${message.BgColor}; color: ${message.TextColor};`,
     });
+    messageItem.appendChild(messageBody);
 
     if (message.Dismissible) {
       const btn = createElement('button', {
@@ -24,36 +29,34 @@ import { createElement, paragraphsFromText } from './utils';
         html: '&times;',
       });
       btn.addEventListener('click', async () => {
-        messageElements.removeChild(messageElement);
+        messageElements.removeChild(messageBody);
         const url = ApiClient.getUrl(`HomeMessage/messages/${message.Id}`);
         await ApiClient.ajax({
           type: 'DELETE',
           url,
         });
       });
-      messageElement.appendChild(btn);
+      messageBody.appendChild(btn);
     }
 
     const titleElement = createElement('h3', {
       class: `${cssClassPrefix}-title`,
       html: message.Title,
     });
-    messageElement.appendChild(titleElement);
+    messageBody.appendChild(titleElement);
 
     const createdDate = new Date(message.CreatedTime * 1000);
     const timeElement = createElement('time', {
       class: `${cssClassPrefix}-time`,
       html: `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`,
     });
-    messageElement.appendChild(timeElement);
+    messageBody.appendChild(timeElement);
 
-    const textElement = createElement('p', {
+    const textElement = createElement('div', {
       class: `${cssClassPrefix}-text`,
       html: paragraphsFromText(message.Text),
     });
-    messageElement.appendChild(textElement);
-
-    messageElements.appendChild(messageElement);
+    messageBody.appendChild(textElement);
   };
 
   /**
@@ -62,17 +65,36 @@ import { createElement, paragraphsFromText } from './utils';
    * @param indexPage The #indexPage element.
    */
   const ready = async (indexPage: HTMLElement) => {
-    const messageElements = createElement('div', {
-      class: `${cssClassPrefix}-messages emby-scroller`,
-    });
-    indexPage.prepend(messageElements);
+    // Load configuration styles.
+    ApiClient.getPluginConfiguration(pluginUniqueId)
+      .then(async (config: any) => {
+        const styles = config.Styles || '';
+        if (styles) {
+          const style = document.createElement('style');
+          style.innerHTML = styles;
+          document.head.appendChild(style);
+        }
 
-    const url = ApiClient.getUrl('HomeMessage/messages');
-    const messages = await ApiClient.getJSON<Message[]>(url);
-    for (let i = 0; i < messages.length; i++) {
-      const message = messages[i];
-      displayMessage(messageElements, message);
-    }
+        const container = createElement('div', {
+          class: `emby-scroller`,
+        });
+        indexPage.prepend(container);
+
+        const messageElements = createElement('ul', {
+          class: `${cssClassPrefix}-messages`,
+        });
+        container.prepend(messageElements);
+
+        const url = ApiClient.getUrl('HomeMessage/messages');
+        const messages = await ApiClient.getJSON<Message[]>(url);
+        for (let i = 0; i < messages.length; i++) {
+          const message = messages[i];
+          displayMessage(messageElements, message);
+        }
+      })
+      .catch((error: any) => {
+        console.error(error);
+      });
   };
 
   /**

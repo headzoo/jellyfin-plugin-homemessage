@@ -1,4 +1,5 @@
 import { Message, MessageInput } from './@types/Message';
+import { Config } from './@types/Config';
 import {
   formValuesAll,
   setHTML,
@@ -20,14 +21,24 @@ import {
    */
   class HomeMessageConfig {
     /**
+     * The plugin unique id.
+     */
+    public static pluginUniqueId = '69d36d38-5615-4128-b2e0-30caf4c5ba86';
+
+    /**
      * The messages.
      */
     private messages: Message[] = [];
 
     /**
-     * The form.
+     * The message form.
      */
     private form!: HTMLFormElement;
+
+    /**
+     * The config form.
+     */
+    private configForm!: HTMLFormElement;
 
     /**
      * The recent background colors list.
@@ -49,10 +60,53 @@ import {
       this.recentTextColorsList = document.getElementById(
         'home-message-config-recent-colors-list-text',
       ) as HTMLUListElement;
-      this.form = document.getElementById('home-message-config-form') as HTMLFormElement;
+
+      this.configForm = document.getElementById('home-message-config-form') as HTMLFormElement;
+      this.configForm.addEventListener('submit', this.saveConfig);
+      this.loadConfig();
+
+      this.form = document.getElementById('home-message-message-form') as HTMLFormElement;
       this.form.addEventListener('submit', this.saveMessage);
       this.resetForm();
+
+      const resetBtn = document.getElementById('home-message-reset-btn') as HTMLButtonElement;
+      resetBtn.addEventListener('click', this.resetConfig);
     }
+
+    /**
+     * Resets the configuration to the default values.
+     */
+    public resetConfig = () => {
+      const styles = `
+/* Wraps each message. */
+.home-message-body {
+
+}
+
+/* The message title. */
+.home-message-title {
+
+}
+
+/* The message time. */
+.home-message-time {
+
+}
+
+/* The message text. */
+.home-message-text p {
+
+}
+      `.trim();
+
+      Dashboard.confirm(
+        'Are you sure you want to reset the configuration?',
+        'Reset Configuration',
+        () => {
+          setValue(this.configForm.querySelector('textarea[name="styles"]'), styles);
+        },
+      );
+    };
 
     /**
      * Loads the existing messages from the server.
@@ -67,6 +121,8 @@ import {
 
     /**
      * Saves the configuration to the server.
+     *
+     * @param e The event.
      */
     public saveMessage = (e: Event) => {
       e.preventDefault();
@@ -95,6 +151,35 @@ import {
     };
 
     /**
+     * Saves the configuration to the server.
+     *
+     * @param e The event.
+     */
+    public saveConfig = (e: Event) => {
+      e.preventDefault();
+
+      Dashboard.showLoadingMsg();
+      ApiClient.getPluginConfiguration(HomeMessageConfig.pluginUniqueId).then((config: Config) => {
+        const values = formValuesAll(this.configForm);
+        config.Styles = (values.styles || '').toString();
+        ApiClient.updatePluginConfiguration(HomeMessageConfig.pluginUniqueId, config).then(
+          (result: any) => {
+            Dashboard.processPluginConfigurationUpdateResult(result);
+          },
+        );
+      });
+    };
+
+    /**
+     * Loads the configuration from the server.
+     */
+    private loadConfig = () => {
+      ApiClient.getPluginConfiguration(HomeMessageConfig.pluginUniqueId).then((config: Config) => {
+        setValue(this.configForm.querySelector('textarea[name="styles"]'), config.Styles);
+      });
+    };
+
+    /**
      * Renders the messages.
      */
     private renderMessages = () => {
@@ -114,7 +199,10 @@ import {
         );
         setAttribute(li.querySelector('[data-message-id]'), 'data-message-id', message.Id);
         setHTML(li.querySelector('h4'), message.Title);
-        setHTML(li.querySelector('p'), paragraphsFromText(message.Text));
+        setHTML(
+          li.querySelector('.home-message-config-messages-item-text'),
+          paragraphsFromText(message.Text),
+        );
         setHTML(
           li.querySelector('time'),
           `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`,

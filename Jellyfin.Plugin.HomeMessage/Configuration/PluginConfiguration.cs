@@ -12,36 +12,31 @@ public class PluginConfiguration : BasePluginConfiguration
     /// </summary>
     public PluginConfiguration()
     {
-        // set default options here
-        Message = "Welcome to Jellyfin!";
-        Dismissible = true;
-        BgColor = "#111827";
-        TextColor = "#ffffff";
-        Position = "top";
+        Styles = """
+/* Wraps each message. */
+.home-message-body {
+
+}
+
+/* The message title. */
+.home-message-title {
+
+}
+
+/* The message time. */
+.home-message-time {
+
+}
+
+/* The message text. */
+.home-message-text p {
+
+}
+""";
     }
 
     /// <summary>
-    /// Gets or sets a value indicating whether some true or false setting is enabled..
+    /// Gets or sets styles that will be injected into the home page.
     /// </summary>
-    public string Message { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether some true or false setting is enabled..
-    /// </summary>
-    public bool Dismissible { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether some true or false setting is enabled..
-    /// </summary>
-    public string BgColor { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether some true or false setting is enabled..
-    /// </summary>
-    public string TextColor { get; set; }
-
-    /// <summary>
-    /// Gets or sets a value indicating whether some true or false setting is enabled..
-    /// </summary>
-    public string Position { get; set; }
+    public string Styles { get; set; }
 }

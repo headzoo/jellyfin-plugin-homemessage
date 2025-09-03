@@ -108,7 +108,7 @@
       init_utils();
       (() => __async(null, null, function* () {
         const { ApiClient, Dashboard } = window;
-        class HomeMessageConfig {
+        const _HomeMessageConfig = class _HomeMessageConfig {
           /**
            * Initializes a new instance of the HomeMessageConfig class.
            */
@@ -117,6 +117,39 @@
              * The messages.
              */
             this.messages = [];
+            /**
+             * Resets the configuration to the default values.
+             */
+            this.resetConfig = () => {
+              const styles = `
+/* Wraps each message. */
+.home-message-body {
+
+}
+
+/* The message title. */
+.home-message-title {
+
+}
+
+/* The message time. */
+.home-message-time {
+
+}
+
+/* The message text. */
+.home-message-text p {
+
+}
+      `.trim();
+              Dashboard.confirm(
+                "Are you sure you want to reset the configuration?",
+                "Reset Configuration",
+                () => {
+                  setValue(this.configForm.querySelector('textarea[name="styles"]'), styles);
+                }
+              );
+            };
             /**
              * Loads the existing messages from the server.
              */
@@ -129,6 +162,8 @@
             };
             /**
              * Saves the configuration to the server.
+             *
+             * @param e The event.
              */
             this.saveMessage = (e) => {
               e.preventDefault();
@@ -153,6 +188,32 @@
               });
             };
             /**
+             * Saves the configuration to the server.
+             *
+             * @param e The event.
+             */
+            this.saveConfig = (e) => {
+              e.preventDefault();
+              Dashboard.showLoadingMsg();
+              ApiClient.getPluginConfiguration(_HomeMessageConfig.pluginUniqueId).then((config2) => {
+                const values = formValuesAll(this.configForm);
+                config2.Styles = (values.styles || "").toString();
+                ApiClient.updatePluginConfiguration(_HomeMessageConfig.pluginUniqueId, config2).then(
+                  (result) => {
+                    Dashboard.processPluginConfigurationUpdateResult(result);
+                  }
+                );
+              });
+            };
+            /**
+             * Loads the configuration from the server.
+             */
+            this.loadConfig = () => {
+              ApiClient.getPluginConfiguration(_HomeMessageConfig.pluginUniqueId).then((config2) => {
+                setValue(this.configForm.querySelector('textarea[name="styles"]'), config2.Styles);
+              });
+            };
+            /**
              * Renders the messages.
              */
             this.renderMessages = () => {
@@ -170,7 +231,10 @@
                 );
                 setAttribute(li.querySelector("[data-message-id]"), "data-message-id", message.Id);
                 setHTML(li.querySelector("h4"), message.Title);
-                setHTML(li.querySelector("p"), paragraphsFromText(message.Text));
+                setHTML(
+                  li.querySelector(".home-message-config-messages-item-text"),
+                  paragraphsFromText(message.Text)
+                );
                 setHTML(
                   li.querySelector("time"),
                   `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`
@@ -394,11 +458,21 @@
             this.recentTextColorsList = document.getElementById(
               "home-message-config-recent-colors-list-text"
             );
-            this.form = document.getElementById("home-message-config-form");
+            this.configForm = document.getElementById("home-message-config-form");
+            this.configForm.addEventListener("submit", this.saveConfig);
+            this.loadConfig();
+            this.form = document.getElementById("home-message-message-form");
             this.form.addEventListener("submit", this.saveMessage);
             this.resetForm();
+            const resetBtn = document.getElementById("home-message-reset-btn");
+            resetBtn.addEventListener("click", this.resetConfig);
           }
-        }
+        };
+        /**
+         * The plugin unique id.
+         */
+        _HomeMessageConfig.pluginUniqueId = "69d36d38-5615-4128-b2e0-30caf4c5ba86";
+        let HomeMessageConfig = _HomeMessageConfig;
         const config = new HomeMessageConfig();
         config.loadMessages();
       }))();
