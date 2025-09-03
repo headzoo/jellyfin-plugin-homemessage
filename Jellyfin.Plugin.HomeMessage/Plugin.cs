@@ -79,6 +79,15 @@ public class Plugin : BasePlugin<PluginConfiguration>, IHasWebPages
                 Name = Name,
                 EmbeddedResourcePath = $"{prefix}.Web.configPage.html",
             },
+            new PluginPageInfo
+            {
+                Name = "HomeMessages",
+                EmbeddedResourcePath = $"{prefix}.Web.messagesPage.html",
+                EnableInMainMenu = true,
+                MenuSection = "Plugins",
+                MenuIcon = "comment",
+                DisplayName = "Home Messages",
+            },
         ];
     }
 }

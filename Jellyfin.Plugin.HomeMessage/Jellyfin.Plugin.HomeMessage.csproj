@@ -40,13 +40,17 @@
   </ItemGroup>
   <ItemGroup>
     <None Remove="Web\configPage.html" />
+    <None Remove="Web\messagesPage.html" />
     <EmbeddedResource Include="Web\configPage.html" />
+    <EmbeddedResource Include="Web\messagesPage.html" />
     <EmbeddedResource Include="Web\js\build\home.js" />
     <EmbeddedResource Include="Web\js\build\home.js.map" />
     <EmbeddedResource Include="Web\js\build\boot.js" />
     <EmbeddedResource Include="Web\js\build\boot.js.map" />
     <EmbeddedResource Include="Web\js\build\config.js" />
     <EmbeddedResource Include="Web\js\build\config.js.map" />
+    <EmbeddedResource Include="Web\js\build\messages.js" />
+    <EmbeddedResource Include="Web\js\build\messages.js.map" />
     <EmbeddedResource Include="Web\css\build\home.css" />
     <EmbeddedResource Include="Web\css\build\home.css.map" />
   </ItemGroup>

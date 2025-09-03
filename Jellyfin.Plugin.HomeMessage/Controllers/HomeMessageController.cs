@@ -227,4 +227,26 @@ public class HomeMessageController(
 
         return Content(r.ReadToEnd(), "application/javascript");
     }
+
+    /// <summary>
+    /// Gets the client-side JavaScript.
+    /// </summary>
+    /// <returns>The response.</returns>
+    [HttpGet("js/build/messages.js")]
+    [AllowAnonymous]
+    public IActionResult GetMessagesJs()
+    {
+        string resourceName = "Jellyfin.Plugin.HomeMessage.Web.js.build.messages.js";
+        using var s = Assembly.GetExecutingAssembly().GetManifestResourceStream(resourceName);
+        if (s is null)
+        {
+            _logger.LogError("Could not find embedded resource {Resource}", resourceName);
+            return NotFound();
+        }
+
+        using var r = new StreamReader(s);
+        Response.Headers.CacheControl = "no-store"; // dev-friendly
+
+        return Content(r.ReadToEnd(), "application/javascript");
+    }
 }
