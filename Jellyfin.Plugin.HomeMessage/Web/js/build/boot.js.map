@@ -1,7 +1,7 @@
 {
   "version": 3,
   "sources": ["../boot.ts"],
-  "sourcesContent": ["(() => {\n  /**\n   * Waits for the window.ApiClient object to be available, then calls ready().\n   */\n  const boot = () => {\n    if (!window.ApiClient || !window.ApiClient.getUrl) {\n      setTimeout(boot, 100);\n      return;\n    }\n\n    const url = window.ApiClient.getUrl('HomeMessage/js/build/home.js');\n    const s = document.createElement('script');\n    s.src = url;\n    s.defer = true;\n    document.head.appendChild(s);\n  };\n  boot();\n})();\n"],
-  "mappings": ";;AAAA,GAAC,MAAM;AAIL,UAAM,OAAO,MAAM;AACjB,UAAI,CAAC,OAAO,aAAa,CAAC,OAAO,UAAU,QAAQ;AACjD,mBAAW,MAAM,GAAG;AACpB;AAAA,MACF;AAEA,YAAM,MAAM,OAAO,UAAU,OAAO,8BAA8B;AAClE,YAAM,IAAI,SAAS,cAAc,QAAQ;AACzC,QAAE,MAAM;AACR,QAAE,QAAQ;AACV,eAAS,KAAK,YAAY,CAAC;AAAA,IAC7B;AACA,SAAK;AAAA,EACP,GAAG;",
+  "sourcesContent": ["(() => {\n  /**\n   * Waits for the window.ApiClient object to be available, then calls ready().\n   */\n  const boot = () => {\n    if (!window.ApiClient || !window.ApiClient.getUrl) {\n      setTimeout(boot, 100);\n      return;\n    }\n\n    const url = window.ApiClient.getUrl('HomeMessage/assets/js/build/home.js');\n    const s = document.createElement('script');\n    s.src = url;\n    s.defer = true;\n    document.head.appendChild(s);\n  };\n  boot();\n})();\n"],
+  "mappings": ";;AAAA,GAAC,MAAM;AAIL,UAAM,OAAO,MAAM;AACjB,UAAI,CAAC,OAAO,aAAa,CAAC,OAAO,UAAU,QAAQ;AACjD,mBAAW,MAAM,GAAG;AACpB;AAAA,MACF;AAEA,YAAM,MAAM,OAAO,UAAU,OAAO,qCAAqC;AACzE,YAAM,IAAI,SAAS,cAAc,QAAQ;AACzC,QAAE,MAAM;AACR,QAAE,QAAQ;AACV,eAAS,KAAK,YAAY,CAAC;AAAA,IAC7B;AACA,SAAK;AAAA,EACP,GAAG;",
   "names": []
 }

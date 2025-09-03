@@ -8,7 +8,7 @@
       return;
     }
 
-    const url = window.ApiClient.getUrl('HomeMessage/js/build/home.js');
+    const url = window.ApiClient.getUrl('HomeMessage/assets/js/build/home.js');
     const s = document.createElement('script');
     s.src = url;
     s.defer = true;
