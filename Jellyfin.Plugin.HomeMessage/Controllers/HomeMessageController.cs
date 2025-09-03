@@ -78,15 +78,13 @@ public class HomeMessageController(
         }
 
         var message = new Message(
-            Guid.NewGuid().ToString(),
             req.Title,
             req.Text,
             req.Dismissible,
             req.BgColor,
             req.TextColor,
             req.TimeStart,
-            req.TimeEnd,
-            DateTimeOffset.UtcNow.ToUnixTimeSeconds()
+            req.TimeEnd
         );
         _messageStore.Add(message);
         _logger.LogInformation("Saved message {Id}", message.Id);
@@ -116,18 +114,16 @@ public class HomeMessageController(
         }
 
         var updated = new Message(
-            message.Id,
             req.Title,
             req.Text,
             req.Dismissible,
             req.BgColor,
             req.TextColor,
             req.TimeStart,
-            req.TimeEnd,
-            message.CreatedTime
+            req.TimeEnd
         );
-        _messageStore.Update(updated);
-        _logger.LogInformation("Updated message {Id}", id);
+        _messageStore.Update(message.Id, updated);
+        _logger.LogInformation("Updated message {Id}", message.Id);
 
         return Ok(updated);
     }
@@ -183,9 +179,7 @@ public class HomeMessageController(
         }
 
         _logger.LogInformation("Dismissed message {Id}", id);
-        _dismissedStore.Add(
-            new Dismissed(Guid.NewGuid().ToString(), id, authInfo.UserId.ToString())
-        );
+        _dismissedStore.Add(new Dismissed(id, authInfo.UserId.ToString()));
 
         return NoContent();
     }

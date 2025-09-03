@@ -6,10 +6,15 @@ namespace Jellyfin.Plugin.HomeMessage.Models;
 /// Represents a dismissed message.
 /// </summary>
 public record Dismissed(
-    // The ID of the model.
-    string Id,
     // The ID of the message.
     string MessageId,
     // The ID of the user.
     string UserId
-) : IHasId;
+) : IModel
+{
+    /// <inheritdoc />
+    public string Id { get; set; } = string.Empty;
+
+    /// <inheritdoc />
+    public long CreatedTime { get; set; }
+}

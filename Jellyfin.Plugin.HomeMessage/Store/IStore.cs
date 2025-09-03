@@ -5,13 +5,14 @@ namespace Jellyfin.Plugin.HomeMessage.Store;
 /// </summary>
 /// <typeparam name="T">The type of the object to store.</typeparam>
 public interface IStore<T>
-    where T : IHasId
+    where T : IModel
 {
     /// <summary>
     /// Adds the given object to the cache and writes it to the database.
     /// </summary>
     /// <param name="obj">The object to add.</param>
-    void Add(T obj);
+    /// <returns>The added object.</returns>
+    T Add(T obj);
 
     /// <summary>
     /// Gets the message with the given ID.
@@ -35,6 +36,7 @@ public interface IStore<T>
     /// <summary>
     /// Updates the given object in the cache and writes it to the database.
     /// </summary>
+    /// <param name="id">The ID of the object to update.</param>
     /// <param name="obj">The object to update.</param>
-    void Update(T obj);
+    void Update(string id, T obj);
 }

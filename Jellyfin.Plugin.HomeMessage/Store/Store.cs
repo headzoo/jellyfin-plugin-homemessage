@@ -13,7 +13,7 @@ namespace Jellyfin.Plugin.HomeMessage.Store;
 /// </summary>
 /// <typeparam name="T">The type of the object to store.</typeparam>
 public abstract class Store<T> : IStore<T>
-    where T : IHasId
+    where T : IModel
 {
     /// <summary>
     /// Gets the cache.
@@ -65,21 +65,29 @@ public abstract class Store<T> : IStore<T>
     }
 
     /// <inheritdoc />
-    public void Add(T obj)
+    public T Add(T obj)
     {
+        obj.Id = GenerateId();
+        obj.CreatedTime = GetUnixTime();
         _cache.Add(obj);
-        File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache, _jsonOptions));
+        FlushCache();
+
+        return obj;
     }
 
     /// <inheritdoc />
-    public void Update(T obj)
+    public void Update(string id, T obj)
     {
         var existing =
-            _cache.FirstOrDefault(m => m.Id == obj.Id)
+            _cache.FirstOrDefault(m => m.Id == id)
             ?? throw new InvalidOperationException("Object not found in cache");
+
+        obj.Id = existing.Id;
+        obj.CreatedTime = existing.CreatedTime;
         _cache.Remove(existing);
         _cache.Add(obj);
-        File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
+
+        FlushCache();
     }
 
     /// <inheritdoc />
@@ -91,6 +99,32 @@ public abstract class Store<T> : IStore<T>
             "Removed {Count} message(s) from cache",
             removed
         );
-        File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache));
+        FlushCache();
+    }
+
+    /// <summary>
+    /// Generates a new unique ID.
+    /// </summary>
+    /// <returns>A new unique ID.</returns>
+    protected string GenerateId()
+    {
+        return Guid.NewGuid().ToString();
+    }
+
+    /// <summary>
+    /// Gets the current Unix timestamp.
+    /// </summary>
+    /// <returns>The current Unix timestamp.</returns>
+    protected long GetUnixTime()
+    {
+        return DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+    }
+
+    /// <summary>
+    /// Flushes the cache to disk.
+    /// </summary>
+    private void FlushCache()
+    {
+        File.WriteAllText(_dbPath, JsonSerializer.Serialize(_cache, _jsonOptions));
     }
 }
