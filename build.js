@@ -1,14 +1,22 @@
 // Build script for the typescript files.
 const esbuild = require('esbuild');
 const path = require('node:path');
+const fs = require('node:fs');
 
-const ROOT = path.resolve(__dirname, '..');
-const JS_DIR = path.join(ROOT, 'Jellyfin.Plugin.HomeMessage', 'Web', 'js');
+// Resolve relative to the repo root (CWD when running `npm run`)
+const JS_DIR = path.resolve('Jellyfin.Plugin.HomeMessage/Web/js');
 const OUT_DIR = path.join(JS_DIR, 'build');
 
 const entryPoints = ['boot.ts', 'home.ts', 'config.ts', 'messages.ts'].map((f) =>
   path.join(JS_DIR, f),
 );
+
+// Optional: helpful diagnostics if CI breaks again
+for (const f of entryPoints) {
+  if (!fs.existsSync(f)) {
+    console.error(`[build] entry missing: ${f}`);
+  }
+}
 
 const args = new Set(process.argv.slice(2));
 const watch = args.has('--watch') || args.has('-w');
@@ -22,7 +30,7 @@ const options = {
   format: 'iife',
   target: ['es2015'],
   platform: 'browser',
-  sourcemap: true, // you used sourcemaps in both dev & prod
+  sourcemap: true,
   minify: prod,
   logLevel: 'info',
 };
@@ -32,12 +40,7 @@ const options = {
     const ctx = await esbuild.context(options);
     await ctx.watch();
     console.log(`[esbuild] watching ${JS_DIR} -> ${OUT_DIR}${prod ? ' (minified)' : ''}`);
-    // keep process alive when run under `concurrently`
     process.stdin.resume();
-    process.on('SIGINT', async () => {
-      await ctx.dispose();
-      process.exit(0);
-    });
   } else {
     await esbuild.build(options);
     console.log(
