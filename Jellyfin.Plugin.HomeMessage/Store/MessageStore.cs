@@ -27,4 +27,13 @@ public class MessageStore(IServerApplicationPaths paths)
                 .Where(m => m.TimeEnd is null || m.TimeEnd > now),
         ];
     }
+
+    /// <inheritdoc />
+    public Message[] GetOlderThanDays(int days)
+    {
+        var now = DateTimeOffset.UtcNow.ToUnixTimeSeconds();
+        var cutoff = now - (days * 24 * 60 * 60);
+
+        return [.. Cache.Where(m => m.CreatedTime < cutoff)];
+    }
 }
