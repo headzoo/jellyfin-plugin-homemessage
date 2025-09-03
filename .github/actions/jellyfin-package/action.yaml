@@ -1,0 +1,27 @@
+name: Jellyfin Package
+description: Setup .NET and package plugin via JPRM
+inputs:
+  dotnet-version:
+    default: '8.0.x'
+    description: Dotnet version to use
+  dotnet-target:
+    default: 'net8.0'
+    description: Target framework to package
+outputs:
+  artifact:
+    value: ${{ steps.jprm.outputs.artifact }}
+    description: Path to the plugin artifact
+
+runs:
+  using: composite
+  steps:
+    - name: Setup .NET
+      uses: actions/setup-dotnet@v4
+      with:
+        dotnet-version: ${{ inputs.dotnet-version }}
+
+    - name: Package with JPRM
+      id: jprm
+      uses: oddstr13/jellyfin-plugin-repository-manager@v1.1.1
+      with:
+        dotnet-target: ${{ inputs.dotnet-target }}

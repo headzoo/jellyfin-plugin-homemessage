@@ -1,0 +1,40 @@
+name: Web Build
+description: Setup Node+pnpm, install deps, typecheck, and build web assets
+inputs:
+  node-version:
+    default: '22'
+    description: Node version to use
+  pnpm-version:
+    default: '9'
+    description: pnpm version to use
+  typecheck:
+    default: 'true'
+    description: Whether to typecheck
+
+runs:
+  using: composite
+  steps:
+    - name: Setup Node
+      uses: actions/setup-node@v4
+      with:
+        node-version: ${{ inputs.node-version }}
+        cache: pnpm
+
+    - name: Setup pnpm
+      uses: pnpm/action-setup@v4
+      with:
+        version: ${{ inputs.pnpm-version }}
+        run_install: false
+
+    - name: Install deps
+      shell: bash
+      run: pnpm install --frozen-lockfile
+
+    - name: Typecheck
+      if: ${{ inputs.typecheck == 'true' }}
+      shell: bash
+      run: pnpm exec tsc --noEmit
+
+    - name: Build web
+      shell: bash
+      run: pnpm build:web
