@@ -10,6 +10,14 @@
       {
         "changelog": "First release",
         "checksum": "",
+        "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v2.0.0.0/jellyfin-plugin-homemessage_2.0.0.0.zip",
+        "targetAbi": "10.9.0.0",
+        "timestamp": "2025-09-03T20:19:10Z",
+        "version": "2.0.0.0"
+      },
+      {
+        "changelog": "First release",
+        "checksum": "",
         "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v0.2.0.0/jellyfin-plugin-homemessage_0.2.0.0.zip",
         "targetAbi": "10.9.0.0",
         "timestamp": "2025-09-03T20:14:46Z",
