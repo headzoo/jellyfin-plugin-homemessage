@@ -10,10 +10,11 @@ description: >
   with scheduling and per-user dismiss tracking.
 category: "General"
 owner: "headzoo"
+imageUrl: https://headzoo.github.io/jellyfin-plugin-homemessage/logo.png
 artifacts:
   - Jellyfin.Plugin.HomeMessage.dll
   - AngleSharp.dll
 changelog: >
   Adds logo
-  
+
   ![HomeMessage logo](https://headzoo.github.io/jellyfin-plugin-homemessage/logo.png)
