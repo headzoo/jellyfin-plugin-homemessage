@@ -29,7 +29,7 @@ permissions are sorted.
 1. In Jellyfin, go to Dashboard → Plugins → Repositories.
 2. Click Add and enter:
     * Name: HomeMessage (or any name you like)
-    * URL: https://github.com/headzoo/jellyfin-plugin-homemessage
+    * URL: https://headzoo.github.io/jellyfin-plugin-homemessage/manifest.json
 3. Click Save.
 4. Go to Dashboard → Plugins → Catalog, search for HomeMessage, click Install.
 5. Restart Jellyfin.
