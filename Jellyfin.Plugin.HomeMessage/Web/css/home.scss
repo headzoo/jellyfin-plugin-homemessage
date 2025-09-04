@@ -5,6 +5,21 @@
         margin: 0;
     }
 
+    &-item {
+        &:has(:focus-visible) {
+            outline: 3px solid #7aa2ff;
+            outline-offset: 4px;
+            border-color: #7aa2ff66;
+        }
+
+        @media (prefers-reduced-motion: reduce) {
+            transition: none !important;
+        }
+        @media (prefers-contrast: more) {
+            border-color: #fff;
+        }
+    }
+
     &-body {
         border-radius: 10px;
         padding: 10px;
@@ -13,7 +28,8 @@
 
     &-title {
         font-weight: bold;
-        font-size: 1.2em;
+        font-size: clamp(1rem, 2.6vmin, 1.25rem);
+        line-height: 1.35;
         margin-bottom: 0.25em;
         margin-top: 0;
         text-align: left;
@@ -21,6 +37,8 @@
 
     &-text {
         margin-top: 1rem;
+        font-size: clamp(0.95rem, 2.2vmin, 1.1rem);
+        line-height: 1.35;
 
         p {
             text-align: left;
@@ -35,10 +53,26 @@
 
     &-dismiss {
         font-size: 1.5em;
-        background: none;
-        border: none;
         color: inherit;
         cursor: pointer;
         float: right;
+        min-width: 44px; min-height: 44px;  /* touch/remote target */
+        display: inline-grid; place-items: center;
+        border-radius: .5rem;
+        border: 1px solid rgba(255,255,255,.15);
+        background: transparent; color: currentColor; cursor: pointer;
+
+        &:hover {
+            background: rgba(255,255,255,.06);
+        }
+
+        &:focus-visible {
+            outline: 3px solid #7aa2ff;
+            outline-offset: 3px; /* high-contrast focus */
+
+            @media (prefers-contrast: more) {
+                outline-width: 4px;
+            }
+        }
     }
 }

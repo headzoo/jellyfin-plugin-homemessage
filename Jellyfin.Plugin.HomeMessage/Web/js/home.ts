@@ -15,19 +15,23 @@ import { createElement, paragraphsFromText } from './utils';
   const displayMessage = (messageElements: HTMLElement, message: Message) => {
     const createdDate = new Date(message.CreatedTime * 1000);
     const messageItem = createElement('li', {
+      role: 'note',
+      class: `${cssClassPrefix}-item`,
+      'aria-labelledby': `home-message-message-${message.Id}`,
+      'aria-describedby': `home-message-description-${message.Id}`,
       html: `
         <div
             class="home-message-body"
             style="background-color: ${message.BgColor}; color: ${message.TextColor};"
         >
-          ${message.Dismissible ? `<button title="Close" class="home-message-dismiss">&times;</button>` : ''}
-          <div class="home-message-title">
+          ${message.Dismissible ? `<button title="Close" type="button" aria-label="Dismiss announcement" class="home-message-dismiss"><span aria-hidden="true">&times;</span></button>` : ''}
+          <div id="home-message-message-${message.Id}" class="home-message-title">
             ${message.Title}
           </div>
           <time class="home-message-time">
             ${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}
           </time>
-          <div class="home-message-text"></div>
+          <div id="home-message-description-${message.Id}" class="home-message-text"></div>
         </div>
         `,
     });
@@ -73,10 +77,20 @@ import { createElement, paragraphsFromText } from './utils';
           class: `emby-scroller`,
         });
         indexPage.prepend(container);
+
+        const section = createElement('section', {
+          class: `${cssClassPrefix}-section`,
+          role: 'region',
+          'aria-label': 'Announcements',
+          'aria-live': 'polite',
+        });
+        container.prepend(section);
+
         const messageElements = createElement('ul', {
           class: `${cssClassPrefix}-messages`,
+          role: 'list',
         });
-        container.prepend(messageElements);
+        section.prepend(messageElements);
 
         // Loads the messages from the server.
         const url = ApiClient.getUrl('HomeMessage/messages');

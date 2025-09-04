@@ -3,6 +3,21 @@
   padding: 0;
   margin: 0;
 }
+.home-message-item:has(:focus-visible) {
+  outline: 3px solid #7aa2ff;
+  outline-offset: 4px;
+  border-color: rgba(122, 162, 255, 0.4);
+}
+@media (prefers-reduced-motion: reduce) {
+  .home-message-item {
+    transition: none !important;
+  }
+}
+@media (prefers-contrast: more) {
+  .home-message-item {
+    border-color: #fff;
+  }
+}
 .home-message-body {
   border-radius: 10px;
   padding: 10px;
@@ -10,13 +25,16 @@
 }
 .home-message-title {
   font-weight: bold;
-  font-size: 1.2em;
+  font-size: clamp(1rem, 2.6vmin, 1.25rem);
+  line-height: 1.35;
   margin-bottom: 0.25em;
   margin-top: 0;
   text-align: left;
 }
 .home-message-text {
   margin-top: 1rem;
+  font-size: clamp(0.95rem, 2.2vmin, 1.1rem);
+  line-height: 1.35;
 }
 .home-message-text p {
   text-align: left;
@@ -28,11 +46,30 @@
 }
 .home-message-dismiss {
   font-size: 1.5em;
-  background: none;
-  border: none;
   color: inherit;
   cursor: pointer;
   float: right;
+  min-width: 44px;
+  min-height: 44px; /* touch/remote target */
+  display: inline-grid;
+  place-items: center;
+  border-radius: 0.5rem;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  background: transparent;
+  color: currentColor;
+  cursor: pointer;
+}
+.home-message-dismiss:hover {
+  background: rgba(255, 255, 255, 0.06);
+}
+.home-message-dismiss:focus-visible {
+  outline: 3px solid #7aa2ff;
+  outline-offset: 3px; /* high-contrast focus */
+}
+@media (prefers-contrast: more) {
+  .home-message-dismiss:focus-visible {
+    outline-width: 4px;
+  }
 }
 
 /*# sourceMappingURL=home.css.map */
