@@ -38,6 +38,7 @@ public abstract class Store<T> : IStore<T>
     protected Store(IServerApplicationPaths paths, string filename)
     {
         ArgumentNullException.ThrowIfNull(paths);
+
         var dir = Path.Combine(paths.DataPath, "plugins", "HomeMessage");
         Directory.CreateDirectory(dir);
         _dbPath = Path.Combine(dir, filename);
@@ -51,6 +52,14 @@ public abstract class Store<T> : IStore<T>
     /// Gets the cache.
     /// </summary>
     protected IReadOnlyList<T> Cache => _cache;
+
+    /// <summary>
+    /// Deletes all files created by the class.
+    /// </summary>
+    public void CleanUp()
+    {
+        File.Delete(_dbPath);
+    }
 
     /// <inheritdoc />
     public T? GetById(string id)

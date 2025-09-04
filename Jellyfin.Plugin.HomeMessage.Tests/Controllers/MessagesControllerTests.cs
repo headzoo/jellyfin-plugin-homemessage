@@ -14,12 +14,12 @@ using Xunit;
 namespace Jellyfin.Plugin.HomeMessage.Tests.Controllers;
 
 /// <summary>
-/// Tests for the <see cref="HomeMessageController"/> class.
+/// Tests for the <see cref="MessagesControllerTests"/> class.
 /// </summary>
-public class HomeMessageControllerTests
+public class MessagesControllerTests
 {
     /// <summary>
-    /// Tests the <see cref="HomeMessageController.GetMessages"/> method.
+    /// Tests the <see cref="MessagesController.GetMessages"/> method.
     /// </summary>
     [Fact]
     public void GetMessages_ReturnsOkObjectResult()
@@ -28,8 +28,8 @@ public class HomeMessageControllerTests
         var auth = GetMockAuth();
         var messageStore = new Mock<IMessageStore>(MockBehavior.Strict);
         var dismissedStore = new Mock<IDismissedStore>(MockBehavior.Strict);
-        var logger = new Mock<ILogger<HomeMessageController>>();
-        var controller = new HomeMessageController(
+        var logger = new Mock<ILogger<MessagesController>>();
+        var controller = new MessagesController(
             auth.Object,
             logger.Object,
             messageStore.Object,
@@ -80,7 +80,7 @@ public class HomeMessageControllerTests
     }
 
     /// <summary>
-    /// Tests the <see cref="HomeMessageController.SaveMessage"/> method.
+    /// Tests the <see cref="MessagesController.SaveMessage"/> method.
     /// </summary>
     [Fact]
     public void SaveMessage_AndReturnsOkObjectResult()
@@ -89,8 +89,8 @@ public class HomeMessageControllerTests
         var auth = GetMockAuth();
         var messageStore = new Mock<IMessageStore>(MockBehavior.Strict);
         var dismissedStore = new Mock<IDismissedStore>(MockBehavior.Strict);
-        var logger = new Mock<ILogger<HomeMessageController>>();
-        var controller = new HomeMessageController(
+        var logger = new Mock<ILogger<MessagesController>>();
+        var controller = new MessagesController(
             auth.Object,
             logger.Object,
             messageStore.Object,
@@ -121,7 +121,7 @@ public class HomeMessageControllerTests
     }
 
     /// <summary>
-    /// Tests the <see cref="HomeMessageController.UpdateMessage"/> method.
+    /// Tests the <see cref="MessagesController.UpdateMessage"/> method.
     /// </summary>
     [Fact]
     public void UpdateMessage_AndReturnsOkObjectResult()
@@ -130,8 +130,8 @@ public class HomeMessageControllerTests
         var auth = GetMockAuth();
         var messageStore = new Mock<IMessageStore>(MockBehavior.Strict);
         var dismissedStore = new Mock<IDismissedStore>(MockBehavior.Strict);
-        var logger = new Mock<ILogger<HomeMessageController>>();
-        var controller = new HomeMessageController(
+        var logger = new Mock<ILogger<MessagesController>>();
+        var controller = new MessagesController(
             auth.Object,
             logger.Object,
             messageStore.Object,
@@ -197,7 +197,7 @@ public class HomeMessageControllerTests
     }
 
     /// <summary>
-    /// Tests the <see cref="HomeMessageController.DeleteMessage"/> method.
+    /// Tests the <see cref="MessagesController.DeleteMessage"/> method.
     /// </summary>
     [Fact]
     public void DeleteMessage_AndReturnsNoContentResult()
@@ -206,8 +206,8 @@ public class HomeMessageControllerTests
         var auth = GetMockAuth();
         var messageStore = new Mock<IMessageStore>(MockBehavior.Strict);
         var dismissedStore = new Mock<IDismissedStore>(MockBehavior.Strict);
-        var logger = new Mock<ILogger<HomeMessageController>>();
-        var controller = new HomeMessageController(
+        var logger = new Mock<ILogger<MessagesController>>();
+        var controller = new MessagesController(
             auth.Object,
             logger.Object,
             messageStore.Object,
@@ -240,7 +240,7 @@ public class HomeMessageControllerTests
     }
 
     /// <summary>
-    /// Tests the <see cref="HomeMessageController.DismissMessageAsync"/> method.
+    /// Tests the <see cref="MessagesController.DismissMessageAsync"/> method.
     /// </summary>
     [Fact]
     public async Task DismissMessage_AndReturnsNoContentResult()
@@ -249,8 +249,8 @@ public class HomeMessageControllerTests
         var auth = GetMockAuth();
         var messageStore = new Mock<IMessageStore>(MockBehavior.Strict);
         var dismissedStore = new Mock<IDismissedStore>(MockBehavior.Strict);
-        var logger = new Mock<ILogger<HomeMessageController>>();
-        var controller = new HomeMessageController(
+        var logger = new Mock<ILogger<MessagesController>>();
+        var controller = new MessagesController(
             auth.Object,
             logger.Object,
             messageStore.Object,
