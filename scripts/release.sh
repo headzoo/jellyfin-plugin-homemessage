@@ -9,6 +9,10 @@ if [[ ! "$PART" =~ ^(major|minor|build|revision)$ ]]; then
   exit 1
 fi
 
+# ---- logo config (override with: LOGO_URL=... ./release.sh minor "msg") ----
+LOGO_URL="${LOGO_URL:-https://headzoo.github.io/jellyfin-plugin-homemessage/logo.png}"
+LOGO_MD="![HomeMessage logo](${LOGO_URL})"
+
 PLUGIN_YAML="build.yaml"
 CSPROJ="Jellyfin.Plugin.HomeMessage/Jellyfin.Plugin.HomeMessage.csproj"
 
@@ -31,27 +35,24 @@ IFS='.' read -r MAJOR MINOR BUILD REVISION <<<"$current"
 
 # --- bump (force base-10 to avoid octal pitfalls like 08/09) ---
 case "$PART" in
-  major)
-    MAJOR=$((10#$MAJOR + 1)); MINOR=0; BUILD=0; REVISION=0
-    ;;
-  minor)
-    MINOR=$((10#$MINOR + 1)); BUILD=0; REVISION=0
-    ;;
-  build)
-    BUILD=$((10#$BUILD + 1)); REVISION=0
-    ;;
-  revision)
-    REVISION=$((10#$REVISION + 1))
-    ;;
+  major)    MAJOR=$((10#$MAJOR + 1)); MINOR=0; BUILD=0; REVISION=0 ;;
+  minor)    MINOR=$((10#$MINOR + 1)); BUILD=0; REVISION=0 ;;
+  build)    BUILD=$((10#$BUILD + 1)); REVISION=0 ;;
+  revision) REVISION=$((10#$REVISION + 1)) ;;
 esac
 
 newver="${MAJOR}.${MINOR}.${BUILD}.${REVISION}"
 tag="v${newver}"
 [[ -n "${MSG}" ]] || MSG="Release ${tag}"
 
+# Notes shown on GitHub release + baked into build.yaml changelog
+# (message + blank line + markdown image)
+NOTES="$(printf "%s\n\n%s\n" "$MSG" "$LOGO_MD")"
+
 echo "Current version: $current"
 echo "Bump: $PART  ->  New version: $newver"
-echo "Changelog: $MSG"
+echo "Changelog (first lines):"
+printf "%s\n" "$NOTES" | sed -n '1,5p'
 
 # --- update version in build.yaml (preserve quoting style) ---
 if grep -qE '^[[:space:]]*version:[[:space:]]*"' "$PLUGIN_YAML"; then
@@ -62,16 +63,15 @@ fi
 
 # --- replace (or add) changelog block without touching other keys ---
 tmpfile="$(mktemp)"
-awk -v msg="$MSG" '
+awk -v msg="$NOTES" '
   BEGIN { inlog=0; printed=0 }
   /^[[:space:]]*changelog:/ {
-    # replace from this key until next top-level key
     print "changelog: >"
     n = split(msg, lines, /\n/);
     for (i=1; i<=n; i++) print "  " lines[i];
     inlog=1; printed=1; next
   }
-  inlog && /^[A-Za-z0-9_-]+:/ { inlog=0 }   # next top-level key
+  inlog && /^[A-Za-z0-9_-]+:/ { inlog=0 }
   !inlog { print }
   END {
     if (!printed) {
@@ -99,7 +99,6 @@ fi
 
 git add "$PLUGIN_YAML"
 
-# Show the diff we’re about to commit
 echo "----- Diff preview -----"
 git --no-pager diff --cached || true
 echo "------------------------"
@@ -121,16 +120,18 @@ git tag -a "$tag" -m "$MSG"
 git push origin HEAD
 git push origin "$tag"
 
-# --- create GitHub release with notes = MSG ---
+# --- create GitHub release with notes = NOTES (message + logo) ---
 if command -v gh >/dev/null 2>&1; then
-  gh release create "$tag" --title "$tag" --notes "$MSG"
+  gh release create "$tag" --title "$tag" --notes "$NOTES"
 else
   origin_url="$(git remote get-url origin)"
   if [[ "$origin_url" =~ github\.com[:/]+([^/]+)/([^/.]+)(\.git)?$ ]]; then
     owner="${BASH_REMATCH[1]}"; repo="${BASH_REMATCH[2]}"
     token="${GITHUB_TOKEN:-${GH_TOKEN:-}}"
     if [[ -n "$token" ]]; then
-      body=$(printf '%s' "$MSG" | sed 's/"/\\"/g')
+      # Escape JSON-sensitive chars and newlines
+      body=$(printf '%s' "$NOTES" \
+        | sed ':a;N;$!ba;s/\\/\\\\/g; s/"/\\"/g; s/\r//g; s/\n/\\n/g')
       curl -sS -X POST \
         -H "Authorization: Bearer $token" \
         -H "Accept: application/vnd.github+json" \
