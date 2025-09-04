@@ -3,10 +3,19 @@
     "category": "General",
     "description": "Adds admin-configurable messages to the Jellyfin home page, with scheduling and per-user dismiss tracking.\n",
     "guid": "69d36d38-5615-4128-b2e0-30caf4c5ba86",
+    "imageUrl": "https://headzoo.github.io/jellyfin-plugin-homemessage/logo.png",
     "name": "Jellyfin.Plugin.HomeMessage",
     "overview": "A Jellyfin plugin that displays messages on the home page.",
     "owner": "headzoo",
     "versions": [
+      {
+        "changelog": "Adds logo\n\n![HomeMessage logo](https://headzoo.github.io/jellyfin-plugin-homemessage/logo.png)",
+        "checksum": "",
+        "sourceUrl": "https://github.com/headzoo/jellyfin-plugin-homemessage/releases/download/v1.0.2.1/jellyfin-plugin-homemessage_1.0.2.1.zip",
+        "targetAbi": "10.9.0.0",
+        "timestamp": "2025-09-04T16:50:40Z",
+        "version": "1.0.2.1"
+      },
       {
         "changelog": "Adds logo\n\n![HomeMessage logo](https://headzoo.github.io/jellyfin-plugin-homemessage/logo.png)",
         "checksum": "",
