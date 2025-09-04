@@ -3,10 +3,17 @@
 Adds admin-configurable messages to the Jellyfin home page, with scheduling and
 per-user dismiss tracking.
 
-## Before you start
+## Before Installing
 
-The plugin needs file permissions to modify the home page. When running Jellyfin
-from Docker, be sure the container user has the correct permissions.
+This plugin modifies Jellyfin’s index.html to inject a small script. On some
+installs the process running Jellyfin does not have write access to the web
+client folder. When that happens, the patch will fail and you’ll see a warning
+in the logs (and the feature won’t activate).
+
+### How to tell if you’re affected
+
+* Check the server logs for messages about failing to write index.html or permission denied.
+* If the plugin appears installed but nothing shows up on the home screen, it’s likely the patch didn’t apply.
 
 ## Installation
 
