@@ -106,30 +106,30 @@
           const messageItem = createElement("li", {
             role: "note",
             class: `${cssClassPrefix}-item`,
-            "aria-labelledby": `home-message-message-${message.Id}`,
-            "aria-describedby": `home-message-description-${message.Id}`,
+            "aria-labelledby": `${cssClassPrefix}-message-${message.Id}`,
+            "aria-describedby": `${cssClassPrefix}-description-${message.Id}`,
             html: `
         <div
-            class="home-message-body"
+            class="${cssClassPrefix}-body"
             style="background-color: ${message.BgColor}; color: ${message.TextColor};"
         >
-          ${message.Dismissible ? `<button title="Close" type="button" aria-label="Dismiss announcement" class="home-message-dismiss"><span aria-hidden="true">&times;</span></button>` : ""}
-          <div id="home-message-message-${message.Id}" class="home-message-title">
+          ${message.Dismissible ? `<button title="Close" type="button" aria-label="Dismiss announcement" class="${cssClassPrefix}-dismiss"><span aria-hidden="true">&times;</span></button>` : ""}
+          <div id="${cssClassPrefix}-message-${message.Id}" class="${cssClassPrefix}-title">
             ${message.Title}
           </div>
-          <time class="home-message-time">
+          <time class="${cssClassPrefix}-time">
             ${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}
           </time>
-          <div id="home-message-description-${message.Id}" class="home-message-text"></div>
+          <div id="${cssClassPrefix}-description-${message.Id}" class="${cssClassPrefix}-text"></div>
         </div>
         `
           });
-          const text = messageItem.querySelector(".home-message-text");
+          const text = messageItem.querySelector(`.${cssClassPrefix}-text`);
           if (text) {
             text.appendChild(paragraphsFromText(message.Text));
           }
           if (message.Dismissible) {
-            const btn = messageItem.querySelector(".home-message-dismiss");
+            const btn = messageItem.querySelector(`.${cssClassPrefix}-dismiss`);
             btn.addEventListener("click", () => __async(null, null, function* () {
               messageElements.removeChild(messageItem);
               const url = ApiClient.getUrl(`HomeMessage/messages/${message.Id}`);
