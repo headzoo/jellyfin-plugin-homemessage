@@ -1,1 +1,402 @@
-<h2>Hello World</h2>
+<!doctype html>
+<html lang="en">
+
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>HomeMessage – A Jellyfin Plugin</title>
+    <meta name="description"
+        content="HomeMessage is a Jellyfin plugin that displays small, dismissible messages on the home screen. Install via the custom repository manifest.">
+    <link rel="icon"
+        href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cpath fill='%2346b' d='M6 12a6 6 0 0 1 6-6h40a6 6 0 0 1 6 6v40a6 6 0 0 1-6 6H12a6 6 0 0 1-6-6z'/%3E%3Cpath fill='%23fff' d='M18 20h28a4 4 0 0 1 4 4v16a4 4 0 0 1-4 4H24l-8 8v-8h-2a4 4 0 0 1-4-4V24a4 4 0 0 1 4-4Z'/%3E%3C/svg%3E" />
+    <style>
+        :root {
+            --bg: #0b0f14;
+            --panel: #0f1520;
+            --text: #e6ecf2;
+            --muted: #a1adbb;
+            --brand: #7aa2ff;
+            --brand-2: #5dc2b8;
+            --border: #1f2a3a;
+            --code-bg: #0b1018;
+            --shadow: 0 10px 30px rgba(0, 0, 0, .35);
+        }
+
+        @media (prefers-color-scheme: light) {
+            :root {
+                --bg: #f6f7fb;
+                --panel: #fff;
+                --text: #17212b;
+                --muted: #415061;
+                --brand: #2f61ff;
+                --brand-2: #0aa096;
+                --border: #e6ebf2;
+                --code-bg: #f2f4f8;
+            }
+        }
+
+        * {
+            box-sizing: border-box;
+        }
+
+        html,
+        body {
+            height: 100%;
+        }
+
+        body {
+            margin: 0;
+            background: radial-gradient(1000px 600px at 10% -10%, rgba(122, 162, 255, .08), transparent),
+                radial-gradient(800px 600px at 120% 10%, rgba(93, 194, 184, .08), transparent), var(--bg);
+            color: var(--text);
+            font: 16px/1.55 system-ui, -apple-system, Segoe UI, Roboto, Ubuntu, Cantarell, "Helvetica Neue", Arial, "Apple Color Emoji", "Segoe UI Emoji";
+        }
+
+        .wrap {
+            max-width: 960px;
+            margin: 0 auto;
+            padding: 48px 20px 80px;
+        }
+
+        header {
+            display: grid;
+            gap: 14px;
+            margin-bottom: 28px;
+        }
+
+        header .badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            border: 1px solid var(--border);
+            background: var(--panel);
+            padding: 6px 10px;
+            border-radius: 999px;
+            width: fit-content;
+            box-shadow: var(--shadow);
+        }
+
+        header h1 {
+            font-size: 34px;
+            line-height: 1.15;
+            margin: 0;
+            letter-spacing: .2px;
+        }
+
+        header p {
+            margin: 0;
+            color: var(--muted);
+        }
+
+        .grid {
+            display: grid;
+            grid-template-columns: 1fr;
+            gap: 16px;
+        }
+
+        @media (min-width: 900px) {
+            .grid {
+                grid-template-columns: 1.2fr .8fr;
+            }
+        }
+
+        .card {
+            background: var(--panel);
+            border: 1px solid var(--border);
+            border-radius: 16px;
+            padding: 18px;
+            box-shadow: var(--shadow);
+        }
+
+        h2 {
+            font-size: 18px;
+            margin: 0 0 10px;
+            letter-spacing: .2px;
+        }
+
+        h3 {
+            font-size: 16px;
+            margin: 18px 0 8px;
+        }
+
+        ol,
+        ul {
+            margin: 8px 0 0 18px;
+        }
+
+        .repo {
+            display: flex;
+            gap: 10px;
+            align-items: center;
+            background: var(--code-bg);
+            border: 1px solid var(--border);
+            padding: 10px;
+            border-radius: 12px;
+        }
+
+        code {
+            font-family: ui-monospace, SFMono-Regular, Menlo, Monaco, Consolas, "Liberation Mono", "Courier New", monospace;
+            font-size: 13px;
+        }
+
+        .btn {
+            appearance: none;
+            border: 1px solid var(--border);
+            background: linear-gradient(180deg, rgba(122, 162, 255, .15), rgba(122, 162, 255, .05));
+            color: var(--text);
+            padding: 8px 12px;
+            border-radius: 10px;
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .btn:active {
+            transform: translateY(1px);
+        }
+
+        .btn.secondary {
+            background: transparent;
+        }
+
+        .kpi {
+            display: flex;
+            gap: 14px;
+            flex-wrap: wrap;
+            margin-top: 10px;
+        }
+
+        .kpi .pill {
+            border: 1px solid var(--border);
+            background: var(--panel);
+            padding: 6px 10px;
+            border-radius: 999px;
+            color: var(--muted);
+        }
+
+        .muted {
+            color: var(--muted);
+        }
+
+        details {
+            border: 1px solid var(--border);
+            border-radius: 12px;
+            background: var(--panel);
+            padding: 10px 12px;
+        }
+
+        details>summary {
+            cursor: pointer;
+            font-weight: 600;
+        }
+
+        .footer {
+            margin-top: 36px;
+            display: flex;
+            gap: 12px;
+            flex-wrap: wrap;
+            align-items: center;
+        }
+
+        .footer a {
+            color: var(--brand);
+            text-decoration: none;
+        }
+
+        .footer a:hover {
+            text-decoration: underline;
+        }
+
+        .list {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+            margin-top: 8px;
+        }
+
+        .release {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border: 1px dashed var(--border);
+            padding: 10px;
+            border-radius: 12px;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="wrap">
+        <header>
+            <div class="badge">📌 Jellyfin Plugin</div>
+            <h1 id="site-title">HomeMessage</h1>
+            <p id="site-tag">Display small, dismissible announcements on your Jellyfin home screen.</p>
+            <div class="kpi">
+                <span class="pill">Latest: <strong id="latest-version">loading…</strong></span>
+                <span class="pill">Target ABI: <strong id="target-abi">loading…</strong></span>
+                <span class="pill">Status: <strong id="manifest-status">checking…</strong></span>
+            </div>
+        </header>
+
+        <div class="grid">
+            <!-- Install -->
+            <section class="card">
+                <h2>Install via Repository (Recommended)</h2>
+                <p class="muted">Add this manifest URL to <em>Dashboard → Plugins → Repositories</em> in Jellyfin, then
+                    install <b>HomeMessage</b> from the catalog:</p>
+                <div class="repo">
+                    <code id="repo-url">https://headzoo.github.io/jellyfin-plugin-homemessage/manifest.json</code>
+                    <button class="btn" id="copy-btn" aria-label="Copy manifest URL">Copy</button>
+                </div>
+                <h3>Steps</h3>
+                <ol>
+                    <li>Open <b>Dashboard → Plugins → Repositories</b>.</li>
+                    <li>Click <b>Add</b> and paste the URL above. Save.</li>
+                    <li>Go to <b>Plugins → Catalog</b>, find <b>HomeMessage</b>, and click <b>Install</b>.</li>
+                    <li><b>Restart Jellyfin</b>, then configure the plugin under <b>Dashboard → Plugins →
+                            HomeMessage</b>.</li>
+                </ol>
+                <details style="margin-top:14px">
+                    <summary>Docker tip: make web client writable (for index.html injection)</summary>
+                    <p class="muted">If you use the injection feature, point Jellyfin at a writable web directory:</p>
+                    <pre><code>services:
+  jellyfin:
+    image: jellyfin/jellyfin:latest
+    volumes:
+      - ./config:/config
+      - ./cache:/cache
+      - ./media:/media
+      - ./web:/web  # writable copy of web client
+    command: ["--webdir", "/web"]
+</code></pre>
+                    <p class="muted">See the README for more options.</p>
+                </details>
+            </section>
+
+            <!-- Releases / Diagnostics -->
+            <aside class="card">
+                <h2>Downloads & Compatibility</h2>
+                <p class="muted">Manifest-derived info (auto-loaded below). Use the latest version matching your
+                    server's ABI.</p>
+                <div class="list" id="releases-list" aria-live="polite"></div>
+                <p class="footer">
+                    <a id="download-link" href="#" rel="noopener">Latest download</a>
+                    ·
+                    <a href="https://github.com/headzoo/jellyfin-plugin-homemessage" rel="noopener">GitHub
+                        Repository</a>
+                    ·
+                    <a href="https://github.com/headzoo/jellyfin-plugin-homemessage#readme" rel="noopener">README</a>
+                </p>
+            </aside>
+        </div>
+
+        <section class="card" style="margin-top:16px">
+            <h2>What is HomeMessage?</h2>
+            <p>HomeMessage injects a small script into Jellyfin's web UI to show site-wide announcements on the home
+                screen. Messages are dismissible per user and can be scheduled or styled.</p>
+            <p class="muted">Note: Index page injection requires write access to the active web directory. If
+                permissions are restricted (common in Docker), point Jellyfin to a writable <code>--webdir</code> or see
+                the README for alternatives.</p>
+        </section>
+
+        <footer class="footer">
+            <span class="muted">© <span id="year"></span> HomeMessage</span>
+        </footer>
+    </div>
+
+    <script>
+        (function () {
+            const $ = (sel) => document.querySelector(sel);
+            const repoUrl = $('#repo-url').textContent.trim();
+            const manifestUrl = new URL('manifest.json', window.location.href).toString();
+
+            // Copy button
+            $('#copy-btn').addEventListener('click', async () => {
+                try {
+                    await navigator.clipboard.writeText(repoUrl);
+                    const btn = $('#copy-btn');
+                    const label = btn.textContent;
+                    btn.textContent = 'Copied!';
+                    setTimeout(() => (btn.textContent = label), 1500);
+                } catch {
+                    alert('Copy failed. Manually select and copy the URL.');
+                }
+            });
+
+            $('#year').textContent = new Date().getFullYear();
+
+            // Semver compare: b - a for descending
+            function cmp(a, b) {
+                const pa = String(a || '').split('.').map(Number);
+                const pb = String(b || '').split('.').map(Number);
+                for (let i = 0; i < Math.max(pa.length, pb.length); i++) {
+                    const da = pa[i] || 0, db = pb[i] || 0;
+                    if (da !== db) return db - da;
+                }
+                return 0;
+            }
+
+            async function loadManifest() {
+                const statusEl = $('#manifest-status');
+                try {
+                    const res = await fetch(manifestUrl, { cache: 'no-cache' });
+                    if (!res.ok) throw new Error('HTTP ' + res.status);
+                    const data = await res.json();
+                    statusEl.textContent = 'OK';
+                    // Basic fields
+                    if (data.name) $('#site-title').textContent = data.name;
+                    const versions = Array.isArray(data.versions) ? data.versions.slice() : [];
+
+                    // Derive latest
+                    versions.sort((a, b) => cmp(a.version, b.version));
+                    const latest = versions[0] || {};
+
+                    $('#latest-version').textContent = latest.version || 'unknown';
+                    $('#target-abi').textContent = data.targetAbi || latest.targetAbi || 'unknown';
+                    if (latest.downloadUrl) $('#download-link').href = latest.downloadUrl;
+
+                    const list = $('#releases-list');
+                    if (versions.length === 0) {
+                        list.innerHTML = '<div class="muted">No releases found in manifest.</div>';
+                    } else {
+                        list.innerHTML = '';
+                        versions.slice(0, 6).forEach(v => {
+                            const div = document.createElement('div');
+                            div.className = 'release';
+                            const left = document.createElement('div');
+                            left.innerHTML = `<strong>v${v.version}</strong><br><span class='muted'>ABI: ${v.targetAbi || 'n/a'}</span>`;
+                            const right = document.createElement('div');
+                            const a = document.createElement('a');
+                            a.className = 'btn secondary';
+                            a.textContent = 'Download';
+                            a.href = v.downloadUrl || '#';
+                            a.rel = 'noopener';
+                            right.appendChild(a);
+                            div.append(left, right);
+                            list.appendChild(div);
+                        });
+                    }
+                } catch (err) {
+                    statusEl.textContent = 'failed';
+                    console.error('Manifest load failed:', err);
+                    $('#releases-list').innerHTML = '<div class="muted">Manifest could not be loaded. Ensure this file sits next to index.html or update the URL.</div>';
+                }
+            }
+
+            loadManifest();
+        })();
+    </script>
+
+    <!-- Optional structured data -->
+    <script type="application/ld+json" id="schema">
+  {
+    "@context": "https://schema.org",
+    "@type": "SoftwareApplication",
+    "name": "HomeMessage (Jellyfin Plugin)",
+    "operatingSystem": "Jellyfin 10.9.x",
+    "applicationCategory": "Multimedia",
+    "offers": { "@type":"Offer", "price":"0", "priceCurrency":"USD" }
+  }
+  </script>
+</body>
+
+</html>
