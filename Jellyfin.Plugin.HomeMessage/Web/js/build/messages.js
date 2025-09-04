@@ -106,7 +106,7 @@
        * Loads the existing messages from the server.
        */
       this.loadMessages = () => {
-        this.ajax("GET", "config/messages").then((messages) => {
+        this.ajax("GET", "admin/messages").then((messages) => {
           this.messages = messages;
           this.renderMessages();
           this.renderRecentColors();
@@ -132,7 +132,7 @@
         this.saveRecentBackgroundColor(message.BgColor);
         this.saveRecentTextColor(message.TextColor);
         const isExisting = !!values.id;
-        const url = isExisting ? `config/messages/${values.id}` : "config/messages";
+        const url = isExisting ? `admin/messages/${values.id}` : "admin/messages";
         this.ajax("POST", url, message).then(() => {
           this.resetForm();
           this.loadMessages();
@@ -231,7 +231,7 @@
           "Delete Message",
           (result) => {
             if (result) {
-              this.ajax("DELETE", `config/messages/${messageId}`).then(() => {
+              this.ajax("DELETE", `admin/messages/${messageId}`).then(() => {
                 this.loadMessages();
                 Dashboard.alert("Message deleted");
               });

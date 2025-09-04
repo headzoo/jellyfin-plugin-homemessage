@@ -57,7 +57,7 @@ export default class MessagesController {
    * Loads the existing messages from the server.
    */
   public loadMessages = () => {
-    this.ajax('GET', 'config/messages').then((messages: Message[]) => {
+    this.ajax('GET', 'admin/messages').then((messages: Message[]) => {
       this.messages = messages;
       this.renderMessages();
       this.renderRecentColors();
@@ -87,7 +87,7 @@ export default class MessagesController {
     this.saveRecentTextColor(message.TextColor);
 
     const isExisting = !!values.id;
-    const url = isExisting ? `config/messages/${values.id}` : 'config/messages';
+    const url = isExisting ? `admin/messages/${values.id}` : 'admin/messages';
     this.ajax('POST', url, message).then(() => {
       this.resetForm();
       this.loadMessages();
@@ -199,7 +199,7 @@ export default class MessagesController {
       'Delete Message',
       (result) => {
         if (result) {
-          this.ajax('DELETE', `config/messages/${messageId}`).then(() => {
+          this.ajax('DELETE', `admin/messages/${messageId}`).then(() => {
             this.loadMessages();
             Dashboard.alert('Message deleted');
           });

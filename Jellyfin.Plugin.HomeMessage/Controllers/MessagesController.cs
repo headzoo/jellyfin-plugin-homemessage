@@ -1,7 +1,4 @@
 using System;
-using System.IO;
-using System.Linq;
-using System.Reflection;
 using System.Threading.Tasks;
 using Jellyfin.Plugin.HomeMessage.Models;
 using Jellyfin.Plugin.HomeMessage.Models.Dto;
@@ -14,20 +11,17 @@ using Microsoft.Extensions.Logging;
 namespace Jellyfin.Plugin.HomeMessage.Controllers;
 
 /// <summary>
-/// The main controller for the plugin.
+/// Controller for retrieving, creating, and dismissing messages.
 /// </summary>
-/// <remarks>
-/// Initializes a new instance of the <see cref="HomeMessageController"/> class.
-/// </remarks>
 /// <param name="auth">Instance of the <see cref="IAuthorizationContext"/> interface.</param>
 /// <param name="logger">Instance of the <see cref="ILogger{TCategoryName}"/> interface.</param>
 /// <param name="messageStore">Instance of the <see cref="MessageStore"/> class.</param>
 /// <param name="dismissedStore">Instance of the <see cref="DismissedStore"/> class.</param>
 [ApiController]
 [Route("HomeMessage")]
-public class HomeMessageController(
+public class MessagesController(
     IAuthorizationContext auth,
-    ILogger<HomeMessageController> logger,
+    ILogger<MessagesController> logger,
     IMessageStore messageStore,
     IDismissedStore dismissedStore
 ) : ControllerBase
@@ -40,7 +34,7 @@ public class HomeMessageController(
     /// <summary>
     /// Gets the logger.
     /// </summary>
-    private readonly ILogger<HomeMessageController> _logger = logger;
+    private readonly ILogger<MessagesController> _logger = logger;
 
     /// <summary>
     /// Gets the message store.
@@ -53,22 +47,22 @@ public class HomeMessageController(
     private readonly IDismissedStore _dismissedStore = dismissedStore;
 
     /// <summary>
-    /// Require a logged-in session (the home screen is behind auth anyway).
+    /// Returns all of the messages.
     /// </summary>
     /// <returns>The response.</returns>
-    [HttpGet("config/messages")]
-    [Authorize]
+    [HttpGet("admin/messages")]
+    [Authorize(Policy = "RequiresElevation")]
     public ActionResult GetMessages()
     {
         return Ok(_messageStore.GetAll());
     }
 
     /// <summary>
-    /// Save the configuration.
+    /// Creates a new message.
     /// </summary>
     /// <param name="req">The request body.</param>
     /// <returns>The response.</returns>
-    [HttpPost("config/messages")]
+    [HttpPost("admin/messages")]
     [Authorize(Policy = "RequiresElevation")]
     public ActionResult SaveMessage([FromBody] MessageInput req)
     {
@@ -98,7 +92,7 @@ public class HomeMessageController(
     /// <param name="req">The message input.</param>
     /// <param name="id">The ID of the message.</param>
     /// <returns>The response.</returns>
-    [HttpPost("config/messages/{id}")]
+    [HttpPost("admin/messages/{id}")]
     [Authorize(Policy = "RequiresElevation")]
     public IActionResult UpdateMessage([FromBody] MessageInput req, string id)
     {
@@ -133,7 +127,7 @@ public class HomeMessageController(
     /// </summary>
     /// <param name="id">The ID of the message.</param>
     /// <returns>The response.</returns>
-    [HttpDelete("config/messages/{id}")]
+    [HttpDelete("admin/messages/{id}")]
     [Authorize(Policy = "RequiresElevation")]
     public IActionResult DeleteMessage(string id)
     {
@@ -144,27 +138,27 @@ public class HomeMessageController(
     }
 
     /// <summary>
-    /// Returns the messages to display on the home page.
+    /// Returns the messages to display on the home page, excluding dismissed messages.
     /// </summary>
     /// <returns>The response.</returns>
     [HttpGet("messages")]
     [Authorize]
     public async Task<ActionResult> MessagesAsync()
     {
-        var authInfo = await _auth.GetAuthorizationInfo(Request).ConfigureAwait(false);
-        if (!authInfo.IsAuthenticated || authInfo.UserId == Guid.Empty || authInfo.IsApiKey)
+        var userId = await GetUserIdAsync().ConfigureAwait(false);
+        if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized();
         }
 
-        var dismissed = _dismissedStore.GetByUserId(authInfo.UserId.ToString());
+        var dismissed = _dismissedStore.GetByUserId(userId);
         var messages = _messageStore.GetNotDismissed(dismissed);
 
         return Ok(messages);
     }
 
     /// <summary>
-    /// Deletes a message.
+    /// Dismisses a message.
     /// </summary>
     /// <param name="id">The ID of the message.</param>
     /// <returns>The response.</returns>
@@ -172,15 +166,30 @@ public class HomeMessageController(
     [Authorize]
     public async Task<IActionResult> DismissMessageAsync(string id)
     {
-        var authInfo = await _auth.GetAuthorizationInfo(Request).ConfigureAwait(false);
-        if (!authInfo.IsAuthenticated || authInfo.UserId == Guid.Empty || authInfo.IsApiKey)
+        var userId = await GetUserIdAsync().ConfigureAwait(false);
+        if (string.IsNullOrEmpty(userId))
         {
             return Unauthorized();
         }
 
         _logger.LogInformation("Dismissed message {Id}", id);
-        _dismissedStore.Add(new Dismissed(id, authInfo.UserId.ToString()));
+        _dismissedStore.Add(new Dismissed(id, userId));
 
         return NoContent();
+    }
+
+    /// <summary>
+    /// Returns the ID of the authenticated user, or else returns an empty string.
+    /// </summary>
+    /// <returns>The user ID.</returns>
+    private async Task<string> GetUserIdAsync()
+    {
+        var authInfo = await _auth.GetAuthorizationInfo(Request).ConfigureAwait(false);
+        if (!authInfo.IsAuthenticated || authInfo.UserId == Guid.Empty || authInfo.IsApiKey)
+        {
+            return string.Empty;
+        }
+
+        return authInfo.UserId.ToString();
     }
 }
