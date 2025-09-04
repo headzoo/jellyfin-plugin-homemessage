@@ -21,7 +21,7 @@ server versions may refuse to load the plugin.
 ## Installation
 
 If your setup restricts writes to the Jellyfin web client directory (common with
-Docker), read the “index.html Patching & Permissions” section above first. The
+Docker), read the permissions section above first. The
 simplest fix is pointing Jellyfin to a writable --webdir. You can still install
 the plugin without that, but the injection feature won’t activate until
 permissions are sorted.
