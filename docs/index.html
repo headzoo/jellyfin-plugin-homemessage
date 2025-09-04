@@ -58,6 +58,15 @@
             padding: 48px 20px 80px;
         }
 
+        #site-title {
+            display: flex;
+            align-items: center;
+        }
+
+        #site-title img {
+            margin-right: 8px;
+        }
+
         header {
             display: grid;
             gap: 14px;
@@ -228,7 +237,10 @@
     <div class="wrap">
         <header>
             <div class="badge">📌 Jellyfin Plugin</div>
-            <h1 id="site-title">HomeMessage</h1>
+            <h1 id="site-title">
+                <img src="logo.png" alt="HomeMessage Logo" width="32" height="32">
+                Jellyfin.Plugin.HomeMessage
+            </h1>
             <p id="site-tag">Display small, dismissible announcements on your Jellyfin home screen.</p>
             <div class="kpi">
                 <span class="pill">Latest: <strong id="latest-version">loading…</strong></span>
@@ -343,7 +355,6 @@
                     const data = (await res.json())[0];
                     statusEl.textContent = 'OK';
                     // Basic fields
-                    if (data.name) $('#site-title').textContent = data.name;
                     const versions = Array.isArray(data.versions) ? data.versions.slice() : [];
 
                     // Derive latest
