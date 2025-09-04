@@ -7,7 +7,8 @@
 </head>
 
 <body>
-    <div data-role="page" class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
+    <div id="home-message-config-page" data-role="page"
+        class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
         data-require="emby-input,emby-textarea,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-radio">
         <style>
             #home-message-config-form {
@@ -73,11 +74,15 @@
                 </form>
 
                 <script>
-                    const url = ApiClient.getUrl('HomeMessage/assets/js/build/config.js');
-                    const s = document.createElement('script');
-                    s.src = url;
-                    s.defer = true;
-                    document.head.appendChild(s);
+                    $('#home-message-config-page').on('pageshow', function () {
+                        $('#home-message-config-script').remove();
+                        const url = ApiClient.getUrl('HomeMessage/assets/js/build/config.js');
+                        const s = document.createElement('script');
+                        s.src = url;
+                        s.defer = true;
+                        s.id = 'home-message-config-script';
+                        document.head.appendChild(s);
+                    });
                 </script>
             </div>
         </div>

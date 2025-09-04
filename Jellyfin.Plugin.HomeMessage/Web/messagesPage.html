@@ -7,7 +7,8 @@
 </head>
 
 <body>
-    <div data-role="page" class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
+    <div id="home-message-messages-page" data-role="page"
+        class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
         data-require="emby-input,emby-textarea,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-radio">
         <style>
             #home-message-messages {
@@ -183,11 +184,15 @@
                 </template>
 
                 <script>
-                    const url = ApiClient.getUrl('HomeMessage/assets/js/build/messages.js');
-                    const s = document.createElement('script');
-                    s.src = url;
-                    s.defer = true;
-                    document.head.appendChild(s);
+                    $('#home-message-messages-page').on('pageshow', function () {
+                        $('#home-message-messages-script').remove();
+                        const url = ApiClient.getUrl('HomeMessage/assets/js/build/messages.js');
+                        const s = document.createElement('script');
+                        s.src = url;
+                        s.defer = true;
+                        s.id = 'home-message-messages-script';
+                        document.head.appendChild(s);
+                    });
                 </script>
             </div>
         </div>
