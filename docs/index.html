@@ -307,7 +307,7 @@
         (function () {
             const $ = (sel) => document.querySelector(sel);
             const repoUrl = $('#repo-url').textContent.trim();
-            const manifestUrl = new URL('manifest.json', window.location.href).toString();
+            const manifestUrl = new URL('https://headzoo.github.io/jellyfin-plugin-homemessage/manifest.json').toString();
 
             // Copy button
             $('#copy-btn').addEventListener('click', async () => {
@@ -340,7 +340,7 @@
                 try {
                     const res = await fetch(manifestUrl, { cache: 'no-cache' });
                     if (!res.ok) throw new Error('HTTP ' + res.status);
-                    const data = await res.json();
+                    const data = (await res.json())[0];
                     statusEl.textContent = 'OK';
                     // Basic fields
                     if (data.name) $('#site-title').textContent = data.name;
@@ -352,7 +352,7 @@
 
                     $('#latest-version').textContent = latest.version || 'unknown';
                     $('#target-abi').textContent = data.targetAbi || latest.targetAbi || 'unknown';
-                    if (latest.downloadUrl) $('#download-link').href = latest.downloadUrl;
+                    if (latest.sourceUrl) $('#download-link').href = latest.sourceUrl;
 
                     const list = $('#releases-list');
                     if (versions.length === 0) {
@@ -368,7 +368,7 @@
                             const a = document.createElement('a');
                             a.className = 'btn secondary';
                             a.textContent = 'Download';
-                            a.href = v.downloadUrl || '#';
+                            a.href = v.sourceUrl || '#';
                             a.rel = 'noopener';
                             right.appendChild(a);
                             div.append(left, right);
