@@ -28,7 +28,7 @@
 
     &-title {
         font-weight: bold;
-        font-size: clamp(1rem, 2.6vmin, 1.25rem);
+        font-size: clamp(1.5rem, 2.6vmin, 2rem);
         line-height: 1.35;
         margin-bottom: 0.25em;
         margin-top: 0;
@@ -37,7 +37,7 @@
 
     &-text {
         margin-top: 1rem;
-        font-size: clamp(0.95rem, 2.2vmin, 1.1rem);
+        font-size: clamp(1.25rem, 2.2vmin, 2rem);
         line-height: 1.35;
 
         p {
