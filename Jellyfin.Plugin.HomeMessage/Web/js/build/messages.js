@@ -31,6 +31,10 @@
      */
     constructor(root, rootToolbar, options = {}) {
       /**
+       * The allowed tags.
+       */
+      this.allowedTags = /* @__PURE__ */ new Set(["STRONG", "EM", "S", "A", "BR", "P", "DIV", "SPAN", "U"]);
+      /**
        * Saved selection range.
        */
       this.savedRange = null;
@@ -130,8 +134,11 @@
           b.addEventListener("mousedown", (e) => e.preventDefault());
           b.addEventListener("click", (e) => {
             this.editable.focus();
-            if (extra) extra(e);
-            else this.exec(cmd);
+            if (extra) {
+              extra(e);
+            } else {
+              this.exec(cmd);
+            }
           });
           b.dataset.cmd = cmd;
           return b;
@@ -430,7 +437,6 @@
       this.cleanHTML = (input) => {
         const tmp = document.createElement("div");
         tmp.innerHTML = input;
-        const allowed = /* @__PURE__ */ new Set(["STRONG", "EM", "S", "A", "BR", "P", "DIV", "SPAN"]);
         const normalize = (node) => {
           if (node.nodeType === Node.ELEMENT_NODE) {
             const el = node;
@@ -443,7 +449,7 @@
               this.replaceTag(el, "S");
             }
             const current = el.tagName;
-            if (!allowed.has(current)) {
+            if (!this.allowedTags.has(current)) {
               const parent = el.parentNode;
               while (el.firstChild) {
                 parent == null ? void 0 : parent.insertBefore(el.firstChild, el);
@@ -623,7 +629,6 @@
           this.messages = messages;
           this.renderMessages();
           this.renderRecentColors();
-          console.log("loaded messages", messages);
         });
       };
       /**
@@ -643,6 +648,7 @@
           TimeStart: values.timeStart ? new Date(values.timeStart.toString()).getTime() / 1e3 : null,
           TimeEnd: values.timeEnd ? new Date(values.timeEnd.toString()).getTime() / 1e3 : null
         };
+        console.log("message", message);
         this.saveRecentBackgroundColor(message.BgColor);
         this.saveRecentTextColor(message.TextColor);
         const isExisting = !!values.id;

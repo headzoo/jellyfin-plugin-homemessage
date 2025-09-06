@@ -40,6 +40,11 @@ export default class TinyEditor {
   private editable!: HTMLDivElement;
 
   /**
+   * The allowed tags.
+   */
+  private allowedTags = new Set(['STRONG', 'EM', 'S', 'A', 'BR', 'P', 'DIV', 'SPAN', 'U']);
+
+  /**
    * The options.
    */
   private opt: Required<Omit<TinyEditorOptions, 'onChange' | 'initialHTML'>> &
@@ -191,8 +196,11 @@ export default class TinyEditor {
       b.addEventListener('mousedown', (e) => e.preventDefault()); // keep focus
       b.addEventListener('click', (e) => {
         this.editable.focus();
-        if (extra) extra(e);
-        else this.exec(cmd as any);
+        if (extra) {
+          extra(e);
+        } else {
+          this.exec(cmd as any);
+        }
       });
       b.dataset.cmd = cmd;
 
@@ -229,7 +237,7 @@ export default class TinyEditor {
    * @param value The value to pass to the command.
    */
   private exec = (
-    cmd: 'bold' | 'italic' | 'strikeThrough' | 'createLink' | 'unlink',
+    cmd: 'bold' | 'italic' | 'strikeThrough' | 'createLink' | 'underline' | 'unlink',
     value?: string,
   ) => {
     if (!this.isSelectionInEditor()) {
@@ -560,8 +568,11 @@ export default class TinyEditor {
     const tmp = document.createElement('div');
     tmp.innerHTML = input;
 
-    const allowed = new Set(['STRONG', 'EM', 'S', 'A', 'BR', 'P', 'DIV', 'SPAN']);
-
+    /**
+     * Normalizes a node.
+     *
+     * @param node The node.
+     */
     const normalize = (node: Node) => {
       if (node.nodeType === Node.ELEMENT_NODE) {
         const el = node as HTMLElement;
@@ -577,7 +588,7 @@ export default class TinyEditor {
         }
 
         const current = el.tagName;
-        if (!allowed.has(current)) {
+        if (!this.allowedTags.has(current)) {
           // unwrap node, keep children
           const parent = el.parentNode;
           while (el.firstChild) {

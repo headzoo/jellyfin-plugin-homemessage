@@ -40,33 +40,7 @@
     />
   </ItemGroup>
   <ItemGroup>
-    <None Remove="Web\configPage.html" />
-    <None Remove="Web\messagesPage.html" />
-    <None Remove="Web\js\build\home.js" />
-    <None Remove="Web\js\build\home.js.map" />
-    <None Remove="Web\js\build\boot.js" />
-    <None Remove="Web\js\build\boot.js.map" />
-    <None Remove="Web\js\build\config.js" />
-    <None Remove="Web\js\build\config.js.map" />
-    <None Remove="Web\js\build\messages.js" />
-    <None Remove="Web\js\build\messages.js.map" />
-    <None Remove="Web\css\build\home.css" />
-    <None Remove="Web\css\build\home.css.map" />
-    <None Remove="Web\css\build\messages.css" />
-    <None Remove="Web\css\build\messages.css.map" />
-    <EmbeddedResource Include="Web\configPage.html" />
-    <EmbeddedResource Include="Web\messagesPage.html" />
-    <EmbeddedResource Include="Web\js\build\home.js" />
-    <EmbeddedResource Include="Web\js\build\home.js.map" />
-    <EmbeddedResource Include="Web\js\build\boot.js" />
-    <EmbeddedResource Include="Web\js\build\boot.js.map" />
-    <EmbeddedResource Include="Web\js\build\config.js" />
-    <EmbeddedResource Include="Web\js\build\config.js.map" />
-    <EmbeddedResource Include="Web\js\build\messages.js" />
-    <EmbeddedResource Include="Web\js\build\messages.js.map" />
-    <EmbeddedResource Include="Web\css\build\home.css" />
-    <EmbeddedResource Include="Web\css\build\home.css.map" />
-    <EmbeddedResource Include="Web\css\build\messages.css" />
-    <EmbeddedResource Include="Web\css\build\messages.css.map" />
+    <None Remove="Web\**\*.html;Web\**\*.js;Web\**\*.css;Web\**\*.map" />
+    <EmbeddedResource Include="Web\**\*.html;Web\**\*.js;Web\**\*.css;Web\**\*.map" />
   </ItemGroup>
 </Project>

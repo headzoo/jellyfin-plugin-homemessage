@@ -72,7 +72,6 @@ export default class MessagesController {
       this.messages = messages;
       this.renderMessages();
       this.renderRecentColors();
-      console.log('loaded messages', messages);
     });
   };
 
@@ -94,6 +93,8 @@ export default class MessagesController {
       TimeStart: values.timeStart ? new Date(values.timeStart.toString()).getTime() / 1000 : null,
       TimeEnd: values.timeEnd ? new Date(values.timeEnd.toString()).getTime() / 1000 : null,
     };
+
+    console.log('message', message);
 
     this.saveRecentBackgroundColor(message.BgColor);
     this.saveRecentTextColor(message.TextColor);
