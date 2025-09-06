@@ -1,153 +1,196 @@
 <!doctype html>
 <html>
-
-<head>
+  <head>
     <meta charset="utf-8" />
     <title>Home Message</title>
-</head>
+  </head>
 
-<body>
-    <div id="home-message-messages-page" data-role="page"
-        class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
-        data-require="emby-input,emby-textarea,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-radio">
+  <body>
+    <div
+      id="home-message-messages-page"
+      data-role="page"
+      class="page type-interior pluginConfigurationPage editorsChoiceConfigurationPage"
+      data-require="emby-input,emby-textarea,emby-button,emby-select,emby-checkbox,emby-linkbutton,emby-radio"
+    >
+      <div data-role="content">
+        <div class="content-primary">
+          <h2>Home Messages</h2>
 
-        <div data-role="content">
-            <div class="content-primary">
-                <h2>Home Messages</h2>
+          <form id="home-message-message-form" class="configForm">
+            <h3>Add Message</h3>
+            <input type="hidden" name="id" value="" />
 
-                <form id="home-message-message-form" class="configForm">
-                    <h3>Add Message</h3>
-                    <input type="hidden" name="id" value="" />
-
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="input-title">Title</label>
-                        <input name="title" is="emby-input" id="input-title" type="text" />
-                    </div>
-
-                    <div class="inputContainer">
-                        <label class="inputLabel inputLabelUnfocused" for="input-message">Message</label>
-                        <div id="input-message-toolbar"></div>
-                        <div is="emby-textarea" class="emby-input emby-textarea home-message-messages-item-body"
-                            id="input-message">
-                        </div>
-                    </div>
-
-                    <div class="home-message-two-col">
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-bg-color">Background color</label>
-                            <input name="bgColor" type="color" is="emby-input" id="input-bg-color"
-                                style="width: 50px" />
-
-                            <div class="home-message-recent-colors-container">
-                                <label>Recent colors</label>
-                                <ul id="home-message-recent-colors-list-bg" class="home-message-recent-colors-list">
-                                </ul>
-                            </div>
-                        </div>
-
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-text-color">Text color</label>
-                            <input name="textColor" type="color" is="emby-input" id="input-text-color"
-                                style="width: 50px" />
-
-                            <div class="home-message-recent-colors-container">
-                                <label>Recent colors</label>
-                                <ul id="home-message-recent-colors-list-text" class="home-message-recent-colors-list">
-                                </ul>
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="home-message-two-col">
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-time-start">Start time</label>
-                            <input name="timeStart" type="datetime-local" is="emby-input" id="input-time-start" />
-                        </div>
-
-                        <div class="inputContainer">
-                            <label class="inputLabel inputLabelUnfocused" for="input-time-end">Start end</label>
-                            <input name="timeEnd" type="datetime-local" is="emby-input" id="input-time-end" />
-                        </div>
-                    </div>
-
-                    <div class="checkboxContainer checkboxContainer-withDescription">
-                        <label class="inputLabel inputLabelUnfocused" for="input-dismissible">
-                            <input name="dismissible" is="emby-checkbox" id="input-dismissible" type="checkbox" />
-                            <span>Dismissible</span>
-                        </label>
-                    </div>
-
-                    <div>
-                        <button id="home-message-submit-btn" is="emby-button" type="submit"
-                            class="raised button-submit block emby-button">
-                            <span>Add</span>
-                        </button>
-                    </div>
-                </form>
-
-                <h3>Existing Messages</h3>
-                <ul id="home-message-messages"></ul>
-
-                <template id="home-message-item-template">
-                    <li>
-                        <div class="home-message-messages-item-body home-message-body">
-                            <div class="home-message-messages-item-heading" data-message-id="">
-                                <div>
-                                    <h4 class="home-message-messages-item-heading-title
-                                    home-message-title"></h4>
-                                    <time class="home-message-messages-item-heading-time
-                                    home-message-time"></time>
-                                </div>
-                                <div>
-                                    <button title="Edit Message" class="home-message-messages-item-heading-edit-btn">
-                                        Edit</button>
-                                    <button title="Delete Message"
-                                        class="home-message-messages-item-heading-close-btn">Delete</button>
-                                </div>
-                            </div>
-
-                            <div class="home-message-messages-item-text home-message-text"></div>
-                        </div>
-                    </li>
-                </template>
-
-                <script>
-                    let controller;
-
-                    document.addEventListener('pageshow', function (e) {
-                        if (e.target.id === 'home-message-messages-page') {
-                            const styles = document.getElementById('home-message-messages-styles');
-                            if (styles) {
-                                styles.remove();
-                            }
-
-                            const link = document.createElement('link');
-                            link.href = ApiClient.getUrl('HomeMessage/assets/css/build/messages.css');
-                            link.rel = 'stylesheet';
-                            link.id = 'home-message-messages-styles';
-                            document.head.appendChild(link);
-
-                            const scripts = document.getElementById('home-message-messages-script');
-                            if (scripts) {
-                                scripts.remove();
-                            }
-
-                            const script = document.createElement('script');
-                            script.src = ApiClient.getUrl('HomeMessage/assets/js/build/messages.js');
-                            script.id = 'home-message-messages-script';
-                            script.onload = function () {
-                                controller = new window.MessagesController();
-                                controller.loadMessages();
-                            };
-                            document.head.appendChild(script);
-                        } else {
-                            controller?.destroy();
-                        }
-                    });
-                </script>
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="input-title">Title</label>
+              <input name="title" is="emby-input" id="input-title" type="text" />
             </div>
-        </div>
-    </div>
-</body>
 
+            <div class="inputContainer">
+              <label class="inputLabel inputLabelUnfocused" for="input-message">Message</label>
+              <div id="input-message-toolbar"></div>
+              <div
+                is="emby-textarea"
+                class="emby-input emby-textarea home-message-messages-item-body"
+                id="input-message"
+              ></div>
+            </div>
+
+            <div class="home-message-two-col">
+              <div class="inputContainer">
+                <label class="inputLabel inputLabelUnfocused" for="input-bg-color"
+                  >Background color</label
+                >
+                <input
+                  name="bgColor"
+                  type="color"
+                  is="emby-input"
+                  id="input-bg-color"
+                  style="width: 50px"
+                />
+
+                <div class="home-message-recent-colors-container">
+                  <label>Recent colors</label>
+                  <ul
+                    id="home-message-recent-colors-list-bg"
+                    class="home-message-recent-colors-list"
+                  ></ul>
+                </div>
+              </div>
+
+              <div class="inputContainer">
+                <label class="inputLabel inputLabelUnfocused" for="input-text-color"
+                  >Text color</label
+                >
+                <input
+                  name="textColor"
+                  type="color"
+                  is="emby-input"
+                  id="input-text-color"
+                  style="width: 50px"
+                />
+
+                <div class="home-message-recent-colors-container">
+                  <label>Recent colors</label>
+                  <ul
+                    id="home-message-recent-colors-list-text"
+                    class="home-message-recent-colors-list"
+                  ></ul>
+                </div>
+              </div>
+            </div>
+
+            <div class="home-message-two-col">
+              <div class="inputContainer">
+                <label class="inputLabel inputLabelUnfocused" for="input-time-start"
+                  >Start time</label
+                >
+                <input
+                  name="timeStart"
+                  type="datetime-local"
+                  is="emby-input"
+                  id="input-time-start"
+                />
+              </div>
+
+              <div class="inputContainer">
+                <label class="inputLabel inputLabelUnfocused" for="input-time-end">Start end</label>
+                <input name="timeEnd" type="datetime-local" is="emby-input" id="input-time-end" />
+              </div>
+            </div>
+
+            <div class="checkboxContainer checkboxContainer-withDescription">
+              <label class="inputLabel inputLabelUnfocused" for="input-dismissible">
+                <input
+                  name="dismissible"
+                  is="emby-checkbox"
+                  id="input-dismissible"
+                  type="checkbox"
+                />
+                <span>Dismissible</span>
+              </label>
+            </div>
+
+            <div>
+              <button
+                id="home-message-submit-btn"
+                is="emby-button"
+                type="submit"
+                class="raised button-submit block emby-button"
+              >
+                <span>Add</span>
+              </button>
+            </div>
+          </form>
+
+          <h3>Existing Messages</h3>
+          <ul id="home-message-messages"></ul>
+
+          <template id="home-message-item-template">
+            <li>
+              <div class="home-message-messages-item-body home-message-body">
+                <div class="home-message-messages-item-heading" data-message-id="">
+                  <div>
+                    <h4 class="home-message-messages-item-heading-title home-message-title"></h4>
+                    <time class="home-message-messages-item-heading-time home-message-time"></time>
+                  </div>
+
+                  <div>
+                    <button
+                      title="Edit Message"
+                      class="home-message-messages-item-heading-edit-btn"
+                    >
+                      Edit
+                    </button>
+                    <button
+                      title="Delete Message"
+                      class="home-message-messages-item-heading-close-btn"
+                    >
+                      Delete
+                    </button>
+                  </div>
+                </div>
+
+                <div class="home-message-messages-item-text home-message-text"></div>
+              </div>
+            </li>
+          </template>
+
+          <script>
+            let messageController;
+
+            document.addEventListener('pageshow', function (e) {
+              if (e.target.id === 'home-message-messages-page') {
+                const styles = document.getElementById('home-message-messages-styles');
+                if (styles) {
+                  styles.remove();
+                }
+
+                const link = document.createElement('link');
+                link.href = ApiClient.getUrl('HomeMessage/assets/css/build/messages.css');
+                link.rel = 'stylesheet';
+                link.id = 'home-message-messages-styles';
+                document.head.appendChild(link);
+
+                const scripts = document.getElementById('home-message-messages-script');
+                if (scripts) {
+                  scripts.remove();
+                }
+
+                const script = document.createElement('script');
+                script.src = ApiClient.getUrl('HomeMessage/assets/js/build/messages.js');
+                script.id = 'home-message-messages-script';
+                script.onload = function () {
+                  messageController = new window.MessagesController();
+                  messageController.loadMessages();
+                };
+                document.head.appendChild(script);
+              } else {
+                messageController?.destroy();
+              }
+            });
+          </script>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>

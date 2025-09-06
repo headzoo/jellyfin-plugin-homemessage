@@ -23,6 +23,14 @@ indent_size = 2
 [*.{csproj,xml}]
 indent_size = 2
 
+# HTML indentation
+[*.{html,cshtml}]
+indent_size = 2
+
+# JavaScript indentation
+[*.{js,ts}]
+indent_size = 2
+
 ###############################
 # .NET Coding Conventions     #
 ###############################

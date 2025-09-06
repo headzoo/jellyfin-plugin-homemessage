@@ -26,8 +26,48 @@ export default class ConfigController {
 
     this.configForm = document.getElementById('home-message-config-form') as HTMLFormElement;
     this.configForm.addEventListener('submit', this.saveConfig);
-    this.loadConfig();
   }
+
+  /**
+   * Removes all event listeners.
+   */
+  public destroy = () => {
+    this.configForm.removeEventListener('submit', this.saveConfig);
+    const resetBtn = document.getElementById('home-message-reset-btn') as HTMLButtonElement;
+    resetBtn.removeEventListener('click', this.resetConfig);
+  };
+
+  /**
+   * Loads the configuration from the server.
+   */
+  public loadConfig = () => {
+    ApiClient.getPluginConfiguration(ConfigController.pluginUniqueId).then((config: Config) => {
+      setValue(this.configForm.querySelector('textarea[name="styles"]'), config.Styles);
+      setValue(this.configForm.querySelector('select[name="expiration"]'), config.Expiration);
+    });
+  };
+
+  /**
+   * Saves the configuration to the server.
+   *
+   * @param e The event.
+   */
+  public saveConfig = (e: Event) => {
+    e.preventDefault();
+
+    Dashboard.showLoadingMsg();
+    ApiClient.getPluginConfiguration(ConfigController.pluginUniqueId).then((config: Config) => {
+      const values = formValuesAll(this.configForm);
+      config.Styles = (values.styles || '').toString();
+      config.Expiration = (values.expiration || 0).toString();
+
+      ApiClient.updatePluginConfiguration(ConfigController.pluginUniqueId, config).then(
+        (result: any) => {
+          Dashboard.processPluginConfigurationUpdateResult(result);
+        },
+      );
+    });
+  };
 
   /**
    * Resets the configuration to the default values.
@@ -63,37 +103,5 @@ export default class ConfigController {
         setValue(this.configForm.querySelector('select[name="expiration"]'), '0');
       },
     );
-  };
-
-  /**
-   * Saves the configuration to the server.
-   *
-   * @param e The event.
-   */
-  public saveConfig = (e: Event) => {
-    e.preventDefault();
-
-    Dashboard.showLoadingMsg();
-    ApiClient.getPluginConfiguration(ConfigController.pluginUniqueId).then((config: Config) => {
-      const values = formValuesAll(this.configForm);
-      config.Styles = (values.styles || '').toString();
-      config.Expiration = (values.expiration || 0).toString();
-
-      ApiClient.updatePluginConfiguration(ConfigController.pluginUniqueId, config).then(
-        (result: any) => {
-          Dashboard.processPluginConfigurationUpdateResult(result);
-        },
-      );
-    });
-  };
-
-  /**
-   * Loads the configuration from the server.
-   */
-  public loadConfig = () => {
-    ApiClient.getPluginConfiguration(ConfigController.pluginUniqueId).then((config: Config) => {
-      setValue(this.configForm.querySelector('textarea[name="styles"]'), config.Styles);
-      setValue(this.configForm.querySelector('select[name="expiration"]'), config.Expiration);
-    });
   };
 }

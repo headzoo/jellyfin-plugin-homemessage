@@ -24,6 +24,42 @@
      */
     constructor() {
       /**
+       * Removes all event listeners.
+       */
+      this.destroy = () => {
+        this.configForm.removeEventListener("submit", this.saveConfig);
+        const resetBtn = document.getElementById("home-message-reset-btn");
+        resetBtn.removeEventListener("click", this.resetConfig);
+      };
+      /**
+       * Loads the configuration from the server.
+       */
+      this.loadConfig = () => {
+        ApiClient.getPluginConfiguration(_ConfigController.pluginUniqueId).then((config) => {
+          setValue(this.configForm.querySelector('textarea[name="styles"]'), config.Styles);
+          setValue(this.configForm.querySelector('select[name="expiration"]'), config.Expiration);
+        });
+      };
+      /**
+       * Saves the configuration to the server.
+       *
+       * @param e The event.
+       */
+      this.saveConfig = (e) => {
+        e.preventDefault();
+        Dashboard.showLoadingMsg();
+        ApiClient.getPluginConfiguration(_ConfigController.pluginUniqueId).then((config) => {
+          const values = formValuesAll(this.configForm);
+          config.Styles = (values.styles || "").toString();
+          config.Expiration = (values.expiration || 0).toString();
+          ApiClient.updatePluginConfiguration(_ConfigController.pluginUniqueId, config).then(
+            (result) => {
+              Dashboard.processPluginConfigurationUpdateResult(result);
+            }
+          );
+        });
+      };
+      /**
        * Resets the configuration to the default values.
        */
       this.resetConfig = () => {
@@ -57,39 +93,10 @@
           }
         );
       };
-      /**
-       * Saves the configuration to the server.
-       *
-       * @param e The event.
-       */
-      this.saveConfig = (e) => {
-        e.preventDefault();
-        Dashboard.showLoadingMsg();
-        ApiClient.getPluginConfiguration(_ConfigController.pluginUniqueId).then((config) => {
-          const values = formValuesAll(this.configForm);
-          config.Styles = (values.styles || "").toString();
-          config.Expiration = (values.expiration || 0).toString();
-          ApiClient.updatePluginConfiguration(_ConfigController.pluginUniqueId, config).then(
-            (result) => {
-              Dashboard.processPluginConfigurationUpdateResult(result);
-            }
-          );
-        });
-      };
-      /**
-       * Loads the configuration from the server.
-       */
-      this.loadConfig = () => {
-        ApiClient.getPluginConfiguration(_ConfigController.pluginUniqueId).then((config) => {
-          setValue(this.configForm.querySelector('textarea[name="styles"]'), config.Styles);
-          setValue(this.configForm.querySelector('select[name="expiration"]'), config.Expiration);
-        });
-      };
       const resetBtn = document.getElementById("home-message-reset-btn");
       resetBtn.addEventListener("click", this.resetConfig);
       this.configForm = document.getElementById("home-message-config-form");
       this.configForm.addEventListener("submit", this.saveConfig);
-      this.loadConfig();
     }
   };
   /**
@@ -99,7 +106,6 @@
   var ConfigController = _ConfigController;
 
   // Jellyfin.Plugin.HomeMessage/Web/js/config.ts
-  var c = new ConfigController();
-  c.loadConfig();
+  window.ConfigController = ConfigController;
 })();
 //# sourceMappingURL=config.js.map

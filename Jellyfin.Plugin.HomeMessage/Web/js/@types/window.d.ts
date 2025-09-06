@@ -1,8 +1,10 @@
 import MessagesController from './MessagesController';
+import ConfigController from './ConfigController';
 
 declare global {
   interface Window {
     MessagesController: MessagesController;
+    ConfigController: ConfigController;
 
     ApiClient: {
       getUrl: (path: string) => string;
