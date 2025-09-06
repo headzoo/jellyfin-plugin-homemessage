@@ -8,11 +8,9 @@
     "build:web": "npm run build:js && npm run build:sass",
     "build:js": "node scripts/build.js",
     "build:prod": "node scripts/build.js --prod",
-    "build:sass": "sass ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
-    "watch:sass": "sass --watch ./Jellyfin.Plugin.HomeMessage/Web/css/home.scss:./Jellyfin.Plugin.HomeMessage/Web/css/build/home.css",
     "watch:js": "node scripts/build.js --watch",
     "watch:typecheck": "tsc -w --noEmit",
-    "dev": "concurrently -k \"npm:watch:js\" \"npm:watch:sass\" \"npm:watch:typecheck\"",
+    "dev": "concurrently -k \"npm:watch:js\" \"npm:watch:typecheck\"",
     "cs:test": "cd Jellyfin.Plugin.HomeMessage && dotnet test",
     "cs:watch": "cd Jellyfin.Plugin.HomeMessage && dotnet watch build"
   },
@@ -22,6 +20,7 @@
   "devDependencies": {
     "concurrently": "^9.2.1",
     "esbuild": "^0.25.9",
+    "esbuild-sass-plugin": "^3.3.1",
     "prettier": "^3.6.2",
     "sass": "^1.91.0",
     "typescript": "^5.9.2"

@@ -1,3 +1,4 @@
+/* Jellyfin.Plugin.HomeMessage/Web/css/home.scss */
 .home-message-messages {
   list-style: none;
   padding: 0;
@@ -44,13 +45,17 @@
 .home-message-text p:last-child {
   margin-bottom: 0;
 }
+.home-message-text a {
+  color: inherit;
+  text-decoration: underline;
+}
 .home-message-dismiss {
   font-size: 1.5em;
   color: inherit;
   cursor: pointer;
   float: right;
   min-width: 44px;
-  min-height: 44px; /* touch/remote target */
+  min-height: 44px;
   display: inline-grid;
   place-items: center;
   border-radius: 0.5rem;
@@ -64,12 +69,11 @@
 }
 .home-message-dismiss:focus-visible {
   outline: 3px solid #7aa2ff;
-  outline-offset: 3px; /* high-contrast focus */
+  outline-offset: 3px;
 }
 @media (prefers-contrast: more) {
   .home-message-dismiss:focus-visible {
     outline-width: 4px;
   }
 }
-
 /*# sourceMappingURL=home.css.map */

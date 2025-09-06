@@ -49,6 +49,11 @@
                 margin-bottom: 0;
             }
         }
+
+        a {
+            color: inherit;
+            text-decoration: underline;
+        }
     }
 
     &-dismiss {

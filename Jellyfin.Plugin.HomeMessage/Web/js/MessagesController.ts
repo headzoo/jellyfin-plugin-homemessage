@@ -1,4 +1,5 @@
 import { Message, MessageInput } from './@types/Message';
+import TinyEditor from './editor';
 import {
   formValuesAll,
   setHTML,
@@ -28,6 +29,11 @@ export default class MessagesController {
   private form!: HTMLFormElement;
 
   /**
+   * The message editor.
+   */
+  private editor!: TinyEditor;
+
+  /**
    * The recent background colors list.
    */
   private recentBackgroundColorsList!: HTMLUListElement;
@@ -51,6 +57,9 @@ export default class MessagesController {
     this.form = document.getElementById('home-message-message-form') as HTMLFormElement;
     this.form.addEventListener('submit', this.saveMessage);
     this.resetForm();
+
+    const input = document.getElementById('input-message') as HTMLDivElement;
+    this.editor = new TinyEditor(input);
   }
 
   /**
@@ -75,7 +84,7 @@ export default class MessagesController {
     const values = formValuesAll(this.form);
     const message: MessageInput = {
       Title: (values.title || '').toString(),
-      Text: (values.message || '').toString(),
+      Text: this.editor.getHTML(),
       BgColor: (values.bgColor || '').toString(),
       TextColor: (values.textColor || '').toString(),
       Dismissible: (values.dismissible && values.dismissible) === 'on',
@@ -168,10 +177,10 @@ export default class MessagesController {
 
     setValue(this.form.querySelector('input[name="id"]'), message.Id);
     setValue(this.form.querySelector('input[name="title"]'), message.Title);
-    setValue(this.form.querySelector('textarea[name="message"]'), message.Text);
     setValue(this.form.querySelector('input[name="bgColor"]'), message.BgColor);
     setValue(this.form.querySelector('input[name="textColor"]'), message.TextColor);
     setChecked(this.form.querySelector('input[name="dismissible"]'), message.Dismissible);
+    this.editor.setHTML(message.Text);
 
     this.form.scrollIntoView({
       behavior: 'smooth',

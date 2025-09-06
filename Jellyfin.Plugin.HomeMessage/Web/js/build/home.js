@@ -47,23 +47,38 @@
     el.appendChild(html);
   }
   function paragraphsFromText(text, opts = {}) {
-    const { mode = "blankLineIsParagraph", keepEmpty = false, className, doc = document } = opts;
+    const {
+      mode = "blankLineIsParagraph",
+      keepEmpty = false,
+      className,
+      doc = document,
+      allowHtml = true
+    } = opts;
     const frag = doc.createDocumentFragment();
     if (text == null) return frag;
     const normalized = String(text).replace(/\r\n?/g, "\n");
     const chunks = mode === "everyLineIsParagraph" ? normalized.split("\n") : normalized.split(/\n{2,}/);
+    const appendContent = (parent, content) => {
+      if (!allowHtml) {
+        parent.appendChild(doc.createTextNode(content));
+        return;
+      }
+      const tpl = doc.createElement("template");
+      tpl.innerHTML = content;
+      parent.appendChild(tpl.content);
+    };
     for (const raw of chunks) {
       const paraText = mode === "everyLineIsParagraph" ? raw : raw.replace(/\n+$/g, "");
       if (!keepEmpty && /^\s*$/.test(paraText)) continue;
       const p = doc.createElement("p");
       if (className) p.className = className;
       if (mode === "everyLineIsParagraph") {
-        p.appendChild(doc.createTextNode(paraText));
+        appendContent(p, paraText);
       } else {
         const lines = paraText.split("\n");
         lines.forEach((line, i) => {
           if (i > 0) p.appendChild(doc.createElement("br"));
-          p.appendChild(doc.createTextNode(line));
+          appendContent(p, line);
         });
       }
       frag.appendChild(p);

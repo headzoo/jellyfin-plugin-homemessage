@@ -52,6 +52,8 @@
     <None Remove="Web\js\build\messages.js.map" />
     <None Remove="Web\css\build\home.css" />
     <None Remove="Web\css\build\home.css.map" />
+    <None Remove="Web\css\build\messages.css" />
+    <None Remove="Web\css\build\messages.css.map" />
     <EmbeddedResource Include="Web\configPage.html" />
     <EmbeddedResource Include="Web\messagesPage.html" />
     <EmbeddedResource Include="Web\js\build\home.js" />
@@ -64,5 +66,7 @@
     <EmbeddedResource Include="Web\js\build\messages.js.map" />
     <EmbeddedResource Include="Web\css\build\home.css" />
     <EmbeddedResource Include="Web\css\build\home.css.map" />
+    <EmbeddedResource Include="Web\css\build\messages.css" />
+    <EmbeddedResource Include="Web\css\build\messages.css.map" />
   </ItemGroup>
 </Project>

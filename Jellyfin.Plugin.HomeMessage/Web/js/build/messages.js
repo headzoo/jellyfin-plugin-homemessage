@@ -20,6 +20,433 @@
     });
   };
 
+  // Jellyfin.Plugin.HomeMessage/Web/js/editor.ts
+  var TinyEditor = class {
+    /**
+     * Constructs a new TinyEditor instance.
+     *
+     * @param root The root input element.
+     * @param options The options.
+     */
+    constructor(root, options = {}) {
+      this.savedRange = null;
+      /**
+       * Handles keydown events.
+       *
+       * @param e The event.
+       */
+      this.onKeydown = (e) => {
+        const meta = e.ctrlKey || e.metaKey;
+        if (!meta) return;
+        const key = e.key.toLowerCase();
+        if (key === "b") {
+          e.preventDefault();
+          this.exec("bold");
+        } else if (key === "i") {
+          e.preventDefault();
+          this.exec("italic");
+        } else if (key === "k") {
+          e.preventDefault();
+          this.handleLink();
+        } else if (key === "s" && e.shiftKey) {
+          e.preventDefault();
+          this.exec("strikeThrough");
+        }
+      };
+      /**
+       * Handles paste events.
+       *
+       * @param e The event.
+       */
+      this.onPaste = (e) => {
+        var _a, _b;
+        e.preventDefault();
+        const text = (_b = (_a = e.clipboardData) == null ? void 0 : _a.getData("text/plain")) != null ? _b : "";
+        document.execCommand("insertText", false, text);
+      };
+      var _a, _b, _c, _d;
+      this.root = root;
+      this.opt = {
+        placeholder: (_a = options.placeholder) != null ? _a : "",
+        toolbar: (_b = options.toolbar) != null ? _b : true,
+        targetBlank: (_c = options.targetBlank) != null ? _c : true,
+        rel: (_d = options.rel) != null ? _d : "noopener noreferrer",
+        initialHTML: options.initialHTML,
+        onChange: options.onChange
+      };
+      this.onSelectionChangeBound = this.onSelectionChange.bind(this);
+      this.onInputBound = this.onInput.bind(this);
+      this.mount();
+    }
+    /**
+     * Focuses the editor.
+     */
+    focus() {
+      this.editable.focus();
+    }
+    /**
+     * Sets the HTML content of the editor.
+     *
+     * @param html The HTML content.
+     */
+    setHTML(html) {
+      const clean = this.cleanHTML(html);
+      this.editable.innerHTML = clean || "";
+      this.togglePlaceholder();
+    }
+    /**
+     * Gets the HTML content of the editor.
+     */
+    getHTML() {
+      return this.cleanHTML(this.editable.innerHTML);
+    }
+    /**
+     * Destroys the editor.
+     */
+    destroy() {
+      document.removeEventListener("selectionchange", this.onSelectionChangeBound);
+      this.editable.removeEventListener("keydown", this.onKeydown);
+      this.editable.removeEventListener("input", this.onInputBound);
+      this.editable.removeEventListener("paste", this.onPaste);
+      this.root.innerHTML = "";
+    }
+    /**
+     * Mounts the editor.
+     */
+    mount() {
+      var _a;
+      this.root.classList.add("te");
+      if (this.opt.toolbar) {
+        this.toolbarEl = this.buildToolbar();
+        const toolbarEl = document.getElementById("input-message-toolbar");
+        toolbarEl.appendChild(this.toolbarEl);
+      }
+      this.editable = document.createElement("div");
+      this.editable.className = "te-editable";
+      this.editable.contentEditable = "true";
+      if (this.opt.placeholder) this.editable.setAttribute("data-placeholder", this.opt.placeholder);
+      this.root.appendChild(this.editable);
+      this.root.addEventListener("click", (e) => {
+        if (e.target === this.editable || this.editable.contains(e.target)) return;
+        if (this.toolbarEl && this.toolbarEl.contains(e.target)) return;
+        this.editable.focus();
+        const range = document.createRange();
+        range.selectNodeContents(this.editable);
+        range.collapse(false);
+        const sel = window.getSelection();
+        if (sel) {
+          sel.removeAllRanges();
+          sel.addRange(range);
+        }
+      });
+      document.addEventListener("selectionchange", this.onSelectionChangeBound);
+      this.editable.addEventListener("keydown", this.onKeydown);
+      this.editable.addEventListener("input", this.onInputBound);
+      this.editable.addEventListener("paste", this.onPaste);
+      const initial = (_a = this.opt.initialHTML) != null ? _a : "";
+      if (initial) this.setHTML(initial);
+      else this.togglePlaceholder();
+    }
+    /**
+     * Builds the toolbar.
+     */
+    buildToolbar() {
+      const tb = document.createElement("div");
+      tb.className = "te-toolbar";
+      const mkBtn = (label, title, cmd, extra) => {
+        const b = document.createElement("button");
+        b.type = "button";
+        b.className = "te-btn emby-button raised";
+        b.textContent = label;
+        b.title = title;
+        b.setAttribute("aria-pressed", "false");
+        b.addEventListener("mousedown", (e) => e.preventDefault());
+        b.addEventListener("click", (e) => {
+          this.editable.focus();
+          if (extra) extra(e);
+          else this.exec(cmd);
+        });
+        b.dataset.cmd = cmd;
+        return b;
+      };
+      const bBold = mkBtn("B", "Bold (Ctrl/Cmd+B)", "bold");
+      bBold.style.fontWeight = "bold";
+      const bItalic = mkBtn("I", "Italic (Ctrl/Cmd+I)", "italic");
+      bItalic.style.fontStyle = "italic";
+      const bUnderline = mkBtn("U", "Underline (Ctrl/Cmd+U)", "underline");
+      bUnderline.style.textDecoration = "underline";
+      const bStrike = mkBtn("S", "Strikethrough (Ctrl/Cmd+Shift+S)", "strikeThrough");
+      bStrike.style.textDecoration = "line-through";
+      const bLink = mkBtn(
+        "\u{1F517}",
+        "Add or edit link (Ctrl/Cmd+K)",
+        "createlink",
+        () => this.handleLink()
+      );
+      const bUnlink = mkBtn("\u26D3\uFE0F", "Remove link", "unlink", () => this.exec("unlink"));
+      tb.append(bBold, bItalic, bUnderline, bStrike, bLink, bUnlink);
+      return tb;
+    }
+    /**
+     * Executes a command.
+     *
+     * @param cmd The command to execute.
+     * @param value The value to pass to the command.
+     */
+    exec(cmd, value) {
+      if (!this.isSelectionInEditor()) return;
+      document.execCommand(cmd, false, value);
+      if (cmd === "createLink") this.ensureLinkAttrs();
+      this.updateToolbarState();
+      this.emitChange();
+    }
+    /**
+     * Handles a link.
+     */
+    handleLink() {
+      if (!this.isSelectionInEditor()) return;
+      const a = this.closestAnchor();
+      const current = (a == null ? void 0 : a.getAttribute("href")) || "";
+      this.saveSelection();
+      const url = window.prompt("Link URL (http(s)://, mailto:, tel:)", current || "https://");
+      this.restoreSelection();
+      if (!url) return;
+      if (a) {
+        if (this.isSafeUrl(url)) {
+          a.setAttribute("href", url);
+          this.applyLinkTargetRel(a);
+        } else {
+          this.unwrapNode(a);
+        }
+      } else {
+        const sel = window.getSelection();
+        if (!sel) return;
+        if (sel.isCollapsed) {
+          document.execCommand("insertText", false, url);
+          const r = sel.getRangeAt(0);
+          r.setStart(r.startContainer, Math.max(0, r.startOffset - url.length));
+          sel.removeAllRanges();
+          sel.addRange(r);
+        }
+        document.execCommand("createLink", false, url);
+        this.ensureLinkAttrs();
+      }
+      this.emitChange();
+    }
+    /**
+     * Ensures link attributes.
+     */
+    ensureLinkAttrs() {
+      const anchors = this.getAnchorsInSelectionOrParent();
+      anchors.forEach((a) => this.applyLinkTargetRel(a));
+    }
+    /**
+     * Applies link target/rel attributes.
+     *
+     * @param a The anchor element.
+     */
+    applyLinkTargetRel(a) {
+      const href = a.getAttribute("href") || "";
+      if (!this.isSafeUrl(href)) {
+        this.unwrapNode(a);
+        return;
+      }
+      if (this.opt.targetBlank) a.setAttribute("target", "_blank");
+      const rel = this.opt.rel.trim();
+      if (rel) a.setAttribute("rel", rel);
+    }
+    /**
+     * Checks if a URL is safe.
+     *
+     * @param url The URL to check.
+     */
+    isSafeUrl(url) {
+      try {
+        const u = new URL(url, window.location.origin);
+        const scheme = u.protocol.replace(":", "").toLowerCase();
+        return ["http", "https", "mailto", "tel"].includes(scheme);
+      } catch (e) {
+        return !/^\s*javascript:/i.test(url);
+      }
+    }
+    /**
+     * Handles input events.
+     */
+    onInput() {
+      this.togglePlaceholder();
+      this.emitChange();
+    }
+    /**
+     * Handles selection change events.
+     */
+    onSelectionChange() {
+      if (!this.isSelectionInEditor() || !this.toolbarEl) return;
+      this.updateToolbarState();
+    }
+    /**
+     * Updates the toolbar state.
+     */
+    updateToolbarState() {
+      if (!this.toolbarEl) return;
+      const states = {
+        // eslint-disable-next-line deprecation/deprecation
+        bold: document.queryCommandState("bold"),
+        // eslint-disable-next-line deprecation/deprecation
+        italic: document.queryCommandState("italic"),
+        // eslint-disable-next-line deprecation/deprecation
+        strikeThrough: document.queryCommandState("strikeThrough")
+      };
+      this.toolbarEl.querySelectorAll(".te-btn").forEach((btn) => {
+        const cmd = btn.dataset.cmd || "";
+        const active = states[cmd] || cmd === "createlink" && !!this.closestAnchor();
+        btn.setAttribute("aria-pressed", active ? "true" : "false");
+      });
+    }
+    /**
+     * Emits a change event.
+     */
+    emitChange() {
+      if (this.opt.onChange) this.opt.onChange(this.getHTML());
+    }
+    /**
+     * Toggles the placeholder.
+     */
+    togglePlaceholder() {
+      var _a, _b;
+      if (!this.opt.placeholder) return;
+      const text = (_b = (_a = this.editable.textContent) == null ? void 0 : _a.trim()) != null ? _b : "";
+      if (text.length === 0 && this.editable.innerHTML.replace(/<br\s*\/?>/gi, "").trim() === "") {
+        this.editable.setAttribute("data-empty", "true");
+      } else {
+        this.editable.removeAttribute("data-empty");
+      }
+    }
+    /**
+     * Checks if the selection is in the editor.
+     */
+    isSelectionInEditor() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return false;
+      const { anchorNode, focusNode } = sel;
+      return !!(anchorNode && this.editable.contains(anchorNode)) || !!(focusNode && this.editable.contains(focusNode));
+    }
+    /**
+     * Saves the selection.
+     */
+    saveSelection() {
+      const sel = window.getSelection();
+      if (sel && sel.rangeCount > 0) this.savedRange = sel.getRangeAt(0).cloneRange();
+    }
+    /**
+     * Restores the selection.
+     */
+    restoreSelection() {
+      if (!this.savedRange) return;
+      const sel = window.getSelection();
+      if (!sel) return;
+      sel.removeAllRanges();
+      sel.addRange(this.savedRange);
+      this.savedRange = null;
+    }
+    /**
+     * Gets the closest anchor element.
+     */
+    closestAnchor() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return null;
+      let node = sel.anchorNode;
+      while (node && node !== this.editable) {
+        if (node instanceof HTMLAnchorElement) return node;
+        node = node.parentNode;
+      }
+      return null;
+    }
+    /**
+     * Gets the anchors in the selection or parent.
+     */
+    getAnchorsInSelectionOrParent() {
+      const sel = window.getSelection();
+      if (!sel || sel.rangeCount === 0) return [];
+      const r = sel.getRangeAt(0);
+      const container = r.commonAncestorContainer instanceof Element ? r.commonAncestorContainer : r.commonAncestorContainer.parentElement;
+      if (!container) return [];
+      const anchors = /* @__PURE__ */ new Set();
+      const a = this.closestAnchor();
+      if (a) anchors.add(a);
+      container.querySelectorAll("a").forEach((el) => {
+        const rects = el.getClientRects();
+        if (rects.length) anchors.add(el);
+      });
+      return Array.from(anchors);
+    }
+    /**
+     * Cleans HTML.
+     *
+     * @param input The input HTML.
+     */
+    cleanHTML(input) {
+      const tmp = document.createElement("div");
+      tmp.innerHTML = input;
+      const allowed = /* @__PURE__ */ new Set(["STRONG", "EM", "S", "A", "BR", "P", "DIV", "SPAN"]);
+      const normalize = (node) => {
+        if (node.nodeType === Node.ELEMENT_NODE) {
+          const el = node;
+          const tag = el.tagName;
+          if (tag === "B") this.replaceTag(el, "STRONG");
+          else if (tag === "I") this.replaceTag(el, "EM");
+          else if (tag === "STRIKE" || tag === "DEL") this.replaceTag(el, "S");
+          const current = el.tagName;
+          if (!allowed.has(current)) {
+            const parent = el.parentNode;
+            while (el.firstChild) parent == null ? void 0 : parent.insertBefore(el.firstChild, el);
+            parent == null ? void 0 : parent.removeChild(el);
+            return;
+          }
+          if (current === "A") {
+            [...el.attributes].forEach((attr) => {
+              if (!["href", "rel", "target"].includes(attr.name)) el.removeAttribute(attr.name);
+            });
+            const href = el.getAttribute("href") || "";
+            if (!this.isSafeUrl(href)) this.unwrapNode(el);
+            else this.applyLinkTargetRel(el);
+          } else {
+            [...el.attributes].forEach((attr) => el.removeAttribute(attr.name));
+          }
+        }
+        let child = node.firstChild;
+        while (child) {
+          const next = child.nextSibling;
+          normalize(child);
+          child = next;
+        }
+      };
+      normalize(tmp);
+      return tmp.innerHTML.replace(/\s+data-empty=\"true\"/g, "").trim();
+    }
+    /**
+     * Replaces a tag.
+     *
+     * @param el The element.
+     * @param newTag The new tag.
+     */
+    replaceTag(el, newTag) {
+      const repl = document.createElement(newTag);
+      while (el.firstChild) repl.appendChild(el.firstChild);
+      el.replaceWith(repl);
+    }
+    /**
+     * Unwraps a node.
+     *
+     * @param el The element.
+     */
+    unwrapNode(el) {
+      const parent = el.parentNode;
+      if (!parent) return;
+      while (el.firstChild) parent.insertBefore(el.firstChild, el);
+      parent.removeChild(el);
+    }
+  };
+
   // Jellyfin.Plugin.HomeMessage/Web/js/utils.ts
   function formValuesAll(form) {
     const fd = new FormData(form);
@@ -67,23 +494,38 @@
     el.setAttribute(name, value);
   }
   function paragraphsFromText(text, opts = {}) {
-    const { mode = "blankLineIsParagraph", keepEmpty = false, className, doc = document } = opts;
+    const {
+      mode = "blankLineIsParagraph",
+      keepEmpty = false,
+      className,
+      doc = document,
+      allowHtml = true
+    } = opts;
     const frag = doc.createDocumentFragment();
     if (text == null) return frag;
     const normalized = String(text).replace(/\r\n?/g, "\n");
     const chunks = mode === "everyLineIsParagraph" ? normalized.split("\n") : normalized.split(/\n{2,}/);
+    const appendContent = (parent, content) => {
+      if (!allowHtml) {
+        parent.appendChild(doc.createTextNode(content));
+        return;
+      }
+      const tpl = doc.createElement("template");
+      tpl.innerHTML = content;
+      parent.appendChild(tpl.content);
+    };
     for (const raw of chunks) {
       const paraText = mode === "everyLineIsParagraph" ? raw : raw.replace(/\n+$/g, "");
       if (!keepEmpty && /^\s*$/.test(paraText)) continue;
       const p = doc.createElement("p");
       if (className) p.className = className;
       if (mode === "everyLineIsParagraph") {
-        p.appendChild(doc.createTextNode(paraText));
+        appendContent(p, paraText);
       } else {
         const lines = paraText.split("\n");
         lines.forEach((line, i) => {
           if (i > 0) p.appendChild(doc.createElement("br"));
-          p.appendChild(doc.createTextNode(line));
+          appendContent(p, line);
         });
       }
       frag.appendChild(p);
@@ -122,7 +564,7 @@
         const values = formValuesAll(this.form);
         const message = {
           Title: (values.title || "").toString(),
-          Text: (values.message || "").toString(),
+          Text: this.editor.getHTML(),
           BgColor: (values.bgColor || "").toString(),
           TextColor: (values.textColor || "").toString(),
           Dismissible: (values.dismissible && values.dismissible) === "on",
@@ -204,10 +646,10 @@
         submitBtn.textContent = "Update";
         setValue(this.form.querySelector('input[name="id"]'), message.Id);
         setValue(this.form.querySelector('input[name="title"]'), message.Title);
-        setValue(this.form.querySelector('textarea[name="message"]'), message.Text);
         setValue(this.form.querySelector('input[name="bgColor"]'), message.BgColor);
         setValue(this.form.querySelector('input[name="textColor"]'), message.TextColor);
         setChecked(this.form.querySelector('input[name="dismissible"]'), message.Dismissible);
+        this.editor.setHTML(message.Text);
         this.form.scrollIntoView({
           behavior: "smooth",
           block: "start"
@@ -392,6 +834,8 @@
       this.form = document.getElementById("home-message-message-form");
       this.form.addEventListener("submit", this.saveMessage);
       this.resetForm();
+      const input = document.getElementById("input-message");
+      this.editor = new TinyEditor(input);
     }
   };
 

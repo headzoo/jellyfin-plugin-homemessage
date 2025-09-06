@@ -1,0 +1,138 @@
+// Variables
+$bp-md: 50em;
+$bp-sm: 640px;
+
+$color-dark: #333;
+$color-mid: #999;
+$color-black: #000;
+$color-white: #fff;
+
+// Message list
+#home-message-messages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+
+  li {
+    margin-bottom: 1em;
+    padding: 0;
+    list-style: none;
+    text-align: left;
+  }
+
+  @media (min-width: $bp-md) {
+    max-width: 54em;
+  }
+}
+
+// Message item body
+.home-message-messages-item-body {
+  padding: 1em;
+  border-radius: 0.5em;
+
+  a {
+    color: inherit;
+    text-decoration: underline;
+  }
+
+  p {
+    margin: 0.5rem 0;
+
+    &:first-child {
+      margin-top: 0;
+    }
+
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+}
+
+// Heading
+.home-message-messages-item-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+
+  &-title {
+    margin: 0 0 0.15em 0;
+    font-size: 1.4em;
+  }
+
+  &-time {
+    font-size: 0.8em;
+  }
+
+  button {
+    background: $color-dark;
+    border: 1px solid $color-mid;
+    border-radius: 0.25rem;
+    box-shadow: 0 0 0.25rem $color-black;
+    color: $color-white;
+    font-size: 1rem;
+    padding: 0.25rem 0.5rem;
+    margin-left: 0.25rem;
+    cursor: pointer;
+  }
+}
+
+// Recent colors
+.home-message-recent-colors-container {
+  margin-top: 0.25rem;
+}
+
+.home-message-recent-colors-list {
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.home-message-recent-colors-item {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid $color-dark;
+  border-radius: 0.25rem;
+  margin-right: 0.25rem;
+  cursor: pointer;
+}
+
+// Input message/editor
+#input-message {
+  min-height: 200px;
+
+  .te-editable:focus {
+    outline: none;
+  }
+}
+
+#input-message-toolbar {
+  margin-bottom: 0.5rem;
+
+  .te-btn {
+    width: 50px;
+    justify-content: center;
+
+    &:first-child {
+      margin-left: 0;
+    }
+  }
+}
+
+// Two-column layout
+.home-message-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr; // side by side on larger screens
+  gap: 1rem;
+  align-items: start; // keep labels aligned nicely
+
+  .inputContainer {
+    width: 100%; // ensure each column fills its grid cell
+  }
+
+  // Stack on small screens
+  @media (max-width: $bp-sm) {
+    grid-template-columns: 1fr;
+  }
+}

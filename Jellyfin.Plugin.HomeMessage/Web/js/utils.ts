@@ -131,6 +131,7 @@ export function setAttribute(el: HTMLElement | null, name: string, value: string
  *   - keepEmpty: keep empty paragraphs if present (default: false)
  *   - className: optional class for each <p> (default: undefined)
  *   - doc: custom Document (e.g., for iframes) (default: document)
+ *   - allowHtml: preserve HTML instead of inserting as text (default: true)
  */
 export function paragraphsFromText(
   text: string,
@@ -139,9 +140,16 @@ export function paragraphsFromText(
     keepEmpty?: boolean;
     className?: string;
     doc?: Document;
+    allowHtml?: boolean;
   } = {},
 ): DocumentFragment {
-  const { mode = 'blankLineIsParagraph', keepEmpty = false, className, doc = document } = opts;
+  const {
+    mode = 'blankLineIsParagraph',
+    keepEmpty = false,
+    className,
+    doc = document,
+    allowHtml = true,
+  } = opts;
 
   const frag = doc.createDocumentFragment();
   if (text == null) return frag;
@@ -153,6 +161,18 @@ export function paragraphsFromText(
   const chunks =
     mode === 'everyLineIsParagraph' ? normalized.split('\n') : normalized.split(/\n{2,}/); // one or more blank lines = new paragraph
 
+  // Helper: append HTML (or text) to a node.
+  const appendContent = (parent: Element, content: string) => {
+    if (!allowHtml) {
+      parent.appendChild(doc.createTextNode(content));
+      return;
+    }
+    // Parse as HTML safely via <template> (scripts won't execute during parse).
+    const tpl = doc.createElement('template');
+    tpl.innerHTML = content;
+    parent.appendChild(tpl.content);
+  };
+
   for (const raw of chunks) {
     const paraText = mode === 'everyLineIsParagraph' ? raw : raw.replace(/\n+$/g, ''); // trim trailing \n inside a paragraph only
     if (!keepEmpty && /^\s*$/.test(paraText)) continue;
@@ -162,13 +182,13 @@ export function paragraphsFromText(
 
     if (mode === 'everyLineIsParagraph') {
       // Whole line is a paragraph.
-      p.appendChild(doc.createTextNode(paraText));
+      appendContent(p, paraText);
     } else {
       // Inside a paragraph, single newlines become <br>.
       const lines = paraText.split('\n');
       lines.forEach((line, i) => {
         if (i > 0) p.appendChild(doc.createElement('br'));
-        p.appendChild(doc.createTextNode(line));
+        appendContent(p, line);
       });
     }
 

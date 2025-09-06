@@ -1,0 +1,106 @@
+/* Jellyfin.Plugin.HomeMessage/Web/css/messages.scss */
+#home-message-messages {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+#home-message-messages li {
+  margin-bottom: 1em;
+  padding: 0;
+  list-style: none;
+  text-align: left;
+}
+@media (min-width: 50em) {
+  #home-message-messages {
+    max-width: 54em;
+  }
+}
+.home-message-messages-item-body {
+  padding: 1em;
+  border-radius: 0.5em;
+}
+.home-message-messages-item-body a {
+  color: inherit;
+  text-decoration: underline;
+}
+.home-message-messages-item-body p {
+  margin: 0.5rem 0;
+}
+.home-message-messages-item-body p:first-child {
+  margin-top: 0;
+}
+.home-message-messages-item-body p:last-child {
+  margin-bottom: 0;
+}
+.home-message-messages-item-heading {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+}
+.home-message-messages-item-heading-title {
+  margin: 0 0 0.15em 0;
+  font-size: 1.4em;
+}
+.home-message-messages-item-heading-time {
+  font-size: 0.8em;
+}
+.home-message-messages-item-heading button {
+  background: #333;
+  border: 1px solid #999;
+  border-radius: 0.25rem;
+  box-shadow: 0 0 0.25rem #000;
+  color: #fff;
+  font-size: 1rem;
+  padding: 0.25rem 0.5rem;
+  margin-left: 0.25rem;
+  cursor: pointer;
+}
+.home-message-recent-colors-container {
+  margin-top: 0.25rem;
+}
+.home-message-recent-colors-list {
+  display: block;
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+.home-message-recent-colors-item {
+  display: inline-block;
+  width: 1.5rem;
+  height: 1.5rem;
+  border: 2px solid #333;
+  border-radius: 0.25rem;
+  margin-right: 0.25rem;
+  cursor: pointer;
+}
+#input-message {
+  min-height: 200px;
+}
+#input-message .te-editable:focus {
+  outline: none;
+}
+#input-message-toolbar {
+  margin-bottom: 0.5rem;
+}
+#input-message-toolbar .te-btn {
+  width: 50px;
+  justify-content: center;
+}
+#input-message-toolbar .te-btn:first-child {
+  margin-left: 0;
+}
+.home-message-two-col {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 1rem;
+  align-items: start;
+}
+.home-message-two-col .inputContainer {
+  width: 100%;
+}
+@media (max-width: 640px) {
+  .home-message-two-col {
+    grid-template-columns: 1fr;
+  }
+}
+/*# sourceMappingURL=messages.css.map */
