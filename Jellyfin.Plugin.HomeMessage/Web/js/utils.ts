@@ -125,13 +125,7 @@ export function setAttribute(el: HTMLElement | null, name: string, value: string
  * - Blank lines separate paragraphs (default).
  * - Single newlines inside a paragraph become <br>.
  *
- * @param text The text to parse.
- * @param opts The options.
- *   - mode: blankLineIsParagraph | everyLineIsParagraph (default: blankLineIsParagraph)
- *   - keepEmpty: keep empty paragraphs if present (default: false)
- *   - className: optional class for each <p> (default: undefined)
- *   - doc: custom Document (e.g., for iframes) (default: document)
- *   - allowHtml: preserve HTML instead of inserting as text (default: true)
+ * SECURITY: If you set allowHtml=true, make sure the input is trusted or sanitized.
  */
 export function paragraphsFromText(
   text: string,

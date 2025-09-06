@@ -16,7 +16,6 @@
   }
 }
 .home-message-messages-item-body {
-  padding: 1em;
   border-radius: 0.5em;
 }
 .home-message-messages-item-body a {
@@ -76,17 +75,17 @@
 #input-message {
   min-height: 200px;
 }
-#input-message .te-editable:focus {
+#input-message .hm-te-editable:focus {
   outline: none;
 }
 #input-message-toolbar {
   margin-bottom: 0.5rem;
 }
-#input-message-toolbar .te-btn {
+#input-message-toolbar .hm-te-btn {
   width: 50px;
   justify-content: center;
 }
-#input-message-toolbar .te-btn:first-child {
+#input-message-toolbar .hm-te-btn:first-child {
   margin-left: 0;
 }
 .home-message-two-col {

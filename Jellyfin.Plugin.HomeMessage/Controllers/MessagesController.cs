@@ -1,5 +1,6 @@
 using System;
 using System.Threading.Tasks;
+using Jellyfin.Plugin.HomeMessage.Html;
 using Jellyfin.Plugin.HomeMessage.Models;
 using Jellyfin.Plugin.HomeMessage.Models.Dto;
 using Jellyfin.Plugin.HomeMessage.Store;
@@ -73,7 +74,7 @@ public class MessagesController(
 
         var message = new Message(
             req.Title,
-            req.Text,
+            HtmlSafety.SanitizeHtml(req.Text),
             req.Dismissible,
             req.BgColor,
             req.TextColor,
@@ -109,7 +110,7 @@ public class MessagesController(
 
         var updated = new Message(
             req.Title,
-            req.Text,
+            HtmlSafety.SanitizeHtml(req.Text),
             req.Dismissible,
             req.BgColor,
             req.TextColor,

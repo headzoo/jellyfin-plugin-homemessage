@@ -1,5 +1,5 @@
 import { Message, MessageInput } from './@types/Message';
-import TinyEditor from './editor';
+import TinyEditor from './TinyEditor';
 import {
   formValuesAll,
   setHTML,
@@ -56,10 +56,12 @@ export default class MessagesController {
 
     this.form = document.getElementById('home-message-message-form') as HTMLFormElement;
     this.form.addEventListener('submit', this.saveMessage);
-    this.resetForm();
 
     const input = document.getElementById('input-message') as HTMLDivElement;
-    this.editor = new TinyEditor(input);
+    const toolbar = document.getElementById('input-message-toolbar') as HTMLDivElement;
+    this.editor = new TinyEditor(input, toolbar);
+
+    this.resetForm();
   }
 
   /**
@@ -70,6 +72,7 @@ export default class MessagesController {
       this.messages = messages;
       this.renderMessages();
       this.renderRecentColors();
+      console.log('loaded messages', messages);
     });
   };
 
@@ -125,13 +128,14 @@ export default class MessagesController {
       setAttribute(li.querySelector('[data-message-id]'), 'data-message-id', message.Id);
       setHTML(li.querySelector('h4'), message.Title);
       setHTML(
-        li.querySelector('.home-message-messages-item-text'),
-        paragraphsFromText(message.Text),
-      );
-      setHTML(
         li.querySelector('time'),
         `${createdDate.toLocaleDateString()} ${createdDate.toLocaleTimeString()}`,
       );
+      setHTML(
+        li.querySelector('.home-message-messages-item-text'),
+        paragraphsFromText(message.Text),
+      );
+
       messages.appendChild(li);
     }
 
@@ -253,6 +257,7 @@ export default class MessagesController {
     setValue(this.form.querySelector('input[name="bgColor"]'), '#333333');
     setValue(this.form.querySelector('input[name="textColor"]'), '#ffffff');
     setChecked(this.form.querySelector('input[name="dismissible"]'), true);
+    this.editor.setHTML('');
 
     const submitBtn = document.querySelector('#home-message-submit-btn span') as HTMLElement;
     submitBtn.textContent = 'Add';

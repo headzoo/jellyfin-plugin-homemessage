@@ -27,7 +27,6 @@ $color-white: #fff;
 
 // Message item body
 .home-message-messages-item-body {
-  padding: 1em;
   border-radius: 0.5em;
 
   a {
@@ -102,7 +101,7 @@ $color-white: #fff;
 #input-message {
   min-height: 200px;
 
-  .te-editable:focus {
+  .hm-te-editable:focus {
     outline: none;
   }
 }
@@ -110,7 +109,7 @@ $color-white: #fff;
 #input-message-toolbar {
   margin-bottom: 0.5rem;
 
-  .te-btn {
+  .hm-te-btn {
     width: 50px;
     justify-content: center;
 
