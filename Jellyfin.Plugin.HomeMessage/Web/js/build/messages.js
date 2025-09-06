@@ -622,6 +622,12 @@
        */
       this.messages = [];
       /**
+       * Destroys the editor.
+       */
+      this.destroy = () => {
+        this.editor.destroy();
+      };
+      /**
        * Loads the existing messages from the server.
        */
       this.loadMessages = () => {
@@ -648,7 +654,6 @@
           TimeStart: values.timeStart ? new Date(values.timeStart.toString()).getTime() / 1e3 : null,
           TimeEnd: values.timeEnd ? new Date(values.timeEnd.toString()).getTime() / 1e3 : null
         };
-        console.log("message", message);
         this.saveRecentBackgroundColor(message.BgColor);
         this.saveRecentTextColor(message.TextColor);
         const isExisting = !!values.id;
@@ -922,5 +927,11 @@
   // Jellyfin.Plugin.HomeMessage/Web/js/messages.ts
   var c = new MessagesController();
   c.loadMessages();
+  document.addEventListener("pageshow", function(e) {
+    var _a;
+    if (((_a = e.target) == null ? void 0 : _a.id) !== "home-message-messages-page") {
+      c.destroy();
+    }
+  });
 })();
 //# sourceMappingURL=messages.js.map

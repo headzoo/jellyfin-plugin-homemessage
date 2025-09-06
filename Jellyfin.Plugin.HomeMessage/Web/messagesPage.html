@@ -112,7 +112,7 @@
                 </template>
 
                 <script>
-                    $('#home-message-messages-page').on('pageshow', function () {
+                    document.addEventListener('pageshow', function (e) {
                         $('#home-message-messages-styles').remove();
                         const url = ApiClient.getUrl('HomeMessage/assets/css/build/messages.css');
                         const s = document.createElement('link');
