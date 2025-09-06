@@ -112,22 +112,37 @@
                 </template>
 
                 <script>
-                    document.addEventListener('pageshow', function (e) {
-                        $('#home-message-messages-styles').remove();
-                        const url = ApiClient.getUrl('HomeMessage/assets/css/build/messages.css');
-                        const s = document.createElement('link');
-                        s.rel = 'stylesheet';
-                        s.href = url;
-                        s.id = 'home-message-messages-styles';
-                        document.head.appendChild(s);
+                    let controller;
 
-                        $('#home-message-messages-script').remove();
-                        const url2 = ApiClient.getUrl('HomeMessage/assets/js/build/messages.js');
-                        const s2 = document.createElement('script');
-                        s2.src = url2;
-                        s2.defer = true;
-                        s2.id = 'home-message-messages-script';
-                        document.head.appendChild(s2);
+                    document.addEventListener('pageshow', function (e) {
+                        if (e.target.id === 'home-message-messages-page') {
+                            const styles = document.getElementById('home-message-messages-styles');
+                            if (styles) {
+                                styles.remove();
+                            }
+
+                            const link = document.createElement('link');
+                            link.href = ApiClient.getUrl('HomeMessage/assets/css/build/messages.css');
+                            link.rel = 'stylesheet';
+                            link.id = 'home-message-messages-styles';
+                            document.head.appendChild(link);
+
+                            const scripts = document.getElementById('home-message-messages-script');
+                            if (scripts) {
+                                scripts.remove();
+                            }
+
+                            const script = document.createElement('script');
+                            script.src = ApiClient.getUrl('HomeMessage/assets/js/build/messages.js');
+                            script.id = 'home-message-messages-script';
+                            script.onload = function () {
+                                controller = new window.MessagesController();
+                                controller.loadMessages();
+                            };
+                            document.head.appendChild(script);
+                        } else {
+                            controller?.destroy();
+                        }
                     });
                 </script>
             </div>

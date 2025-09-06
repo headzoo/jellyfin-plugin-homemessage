@@ -1,5 +1,9 @@
+import MessagesController from './MessagesController';
+
 declare global {
   interface Window {
+    MessagesController: MessagesController;
+
     ApiClient: {
       getUrl: (path: string) => string;
       getJSON: <T = unknown>(url: string) => Promise<T>;

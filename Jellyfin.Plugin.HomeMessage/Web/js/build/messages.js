@@ -70,7 +70,9 @@
         this.editable.removeEventListener("keydown", this.onKeydown);
         this.editable.removeEventListener("input", this.onInput);
         this.editable.removeEventListener("paste", this.onPaste);
+        this.editable.remove();
         this.root.innerHTML = "";
+        this.rootToolbar.innerHTML = "";
       };
       /**
        * Mounts the editor.
@@ -80,7 +82,6 @@
         this.root.classList.add("hm-te");
         if (this.opt.toolbar) {
           this.toolbarEl = this.buildToolbar();
-          this.rootToolbar.innerHTML = "";
           this.rootToolbar.appendChild(this.toolbarEl);
         }
         this.editable = document.createElement("div");
@@ -626,6 +627,21 @@
        */
       this.destroy = () => {
         this.editor.destroy();
+        this.form.removeEventListener("submit", this.saveMessage);
+        const editBtns = document.getElementsByClassName(
+          "home-message-messages-item-heading-edit-btn"
+        );
+        for (let i = 0; i < editBtns.length; i++) {
+          const btn = editBtns[i];
+          btn.removeEventListener("click", this.editMessage);
+        }
+        const closeBtns = document.getElementsByClassName(
+          "home-message-messages-item-heading-close-btn"
+        );
+        for (let i = 0; i < closeBtns.length; i++) {
+          const btn = closeBtns[i];
+          btn.removeEventListener("click", this.deleteMessage);
+        }
       };
       /**
        * Loads the existing messages from the server.
@@ -837,7 +853,6 @@
             li.classList.add("home-message-recent-colors-item");
             li.addEventListener("click", () => {
               setValue(this.form.querySelector('input[name="textColor"]'), color);
-              this.saveRecentTextColor(color);
             });
             this.recentTextColorsList.appendChild(li);
           }
@@ -925,13 +940,6 @@
   };
 
   // Jellyfin.Plugin.HomeMessage/Web/js/messages.ts
-  var c = new MessagesController();
-  c.loadMessages();
-  document.addEventListener("pageshow", function(e) {
-    var _a;
-    if (((_a = e.target) == null ? void 0 : _a.id) !== "home-message-messages-page") {
-      c.destroy();
-    }
-  });
+  window.MessagesController = MessagesController;
 })();
 //# sourceMappingURL=messages.js.map

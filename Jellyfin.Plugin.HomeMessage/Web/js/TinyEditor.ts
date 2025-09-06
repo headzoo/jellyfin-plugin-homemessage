@@ -112,7 +112,9 @@ export default class TinyEditor {
     this.editable.removeEventListener('keydown', this.onKeydown);
     this.editable.removeEventListener('input', this.onInput);
     this.editable.removeEventListener('paste', this.onPaste);
+    this.editable.remove();
     this.root.innerHTML = '';
+    this.rootToolbar.innerHTML = '';
   };
 
   /**
@@ -123,7 +125,6 @@ export default class TinyEditor {
 
     if (this.opt.toolbar) {
       this.toolbarEl = this.buildToolbar();
-      this.rootToolbar.innerHTML = '';
       this.rootToolbar.appendChild(this.toolbarEl);
     }
 

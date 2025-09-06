@@ -69,6 +69,23 @@ export default class MessagesController {
    */
   public destroy = () => {
     this.editor.destroy();
+    this.form.removeEventListener('submit', this.saveMessage);
+
+    const editBtns = document.getElementsByClassName(
+      'home-message-messages-item-heading-edit-btn',
+    ) as HTMLCollectionOf<HTMLButtonElement>;
+    for (let i = 0; i < editBtns.length; i++) {
+      const btn = editBtns[i];
+      btn.removeEventListener('click', this.editMessage);
+    }
+
+    const closeBtns = document.getElementsByClassName(
+      'home-message-messages-item-heading-close-btn',
+    ) as HTMLCollectionOf<HTMLButtonElement>;
+    for (let i = 0; i < closeBtns.length; i++) {
+      const btn = closeBtns[i];
+      btn.removeEventListener('click', this.deleteMessage);
+    }
   };
 
   /**
@@ -307,7 +324,6 @@ export default class MessagesController {
         li.classList.add('home-message-recent-colors-item');
         li.addEventListener('click', () => {
           setValue(this.form.querySelector('input[name="textColor"]'), color);
-          this.saveRecentTextColor(color);
         });
         this.recentTextColorsList.appendChild(li);
       }
