@@ -5,12 +5,11 @@
   "main": "index.js",
   "scripts": {
     "build": "cd Jellyfin.Plugin.HomeMessage && dotnet publish -c Release -f net8.0",
-    "build:web": "npm run build:js && npm run build:sass",
-    "build:js": "node scripts/build.js",
+    "build:web": "node scripts/build.js",
     "build:prod": "node scripts/build.js --prod",
-    "watch:js": "node scripts/build.js --watch",
+    "watch:web": "node scripts/build.js --watch",
     "watch:typecheck": "tsc -w --noEmit",
-    "dev": "concurrently -k \"npm:watch:js\" \"npm:watch:typecheck\"",
+    "dev": "concurrently -k \"npm:watch:web\" \"npm:watch:typecheck\"",
     "cs:test": "cd Jellyfin.Plugin.HomeMessage && dotnet test",
     "cs:watch": "cd Jellyfin.Plugin.HomeMessage && dotnet watch build"
   },
